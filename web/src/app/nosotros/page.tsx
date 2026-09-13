@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { NEGOCIO } from '@/lib/config'
+import { obtenerProductos } from '@/lib/catalogo'
+import { contarRecetas } from '@/lib/textos'
 
 export const metadata: Metadata = {
   title: 'Nuestra historia',
@@ -10,7 +12,14 @@ export const metadata: Metadata = {
   alternates: { canonical: '/nosotros' },
 }
 
-export default function Nosotros() {
+/** El catálogo vive en la base de datos: se refresca solo cada 5 minutos
+ *  y al instante cuando el panel guarda un cambio. */
+export const revalidate = 300
+
+export default async function Nosotros() {
+  const productos = await obtenerProductos()
+  const recetas = contarRecetas(productos.length)
+
   return (
     <div className="mx-auto max-w-3xl px-4 py-12">
       <header className="flex flex-col gap-3">
@@ -38,7 +47,7 @@ export default function Nosotros() {
           La segunda ya la pidieron las vecinas.
         </p>
         <p className="text-[1.15rem] text-tinta">
-          Hoy hacemos seis recetas, todas de glicerina vegetal, todas vertidas a
+          Hoy hacemos {recetas}, todas de glicerina vegetal, todas vertidas a
           mano, molde por molde.
         </p>
         <p>
@@ -82,7 +91,7 @@ export default function Nosotros() {
           href="/catalogo"
           className="mt-4 inline-block rounded-full bg-rosa px-7 py-3 font-semibold text-white transition hover:bg-rosa-hondo"
         >
-          Conoce las seis recetas
+          Conoce el catálogo
         </Link>
       </div>
     </div>

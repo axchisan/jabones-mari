@@ -42,3 +42,6 @@ next-env.d.ts
 
 # Pedidos de desarrollo (sin base de datos conectada)
 .pedidos-dev.json
+
+# Migraciones generadas: se versionan. Credenciales, no.
+.env*.local

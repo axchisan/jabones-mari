@@ -8,6 +8,10 @@ import { TarjetaProducto } from '@/components/tarjeta-producto'
 import { obtenerProducto, obtenerProductos } from '@/lib/catalogo'
 import { NEGOCIO, SITIO_URL } from '@/lib/config'
 
+/** El catálogo vive en la base de datos: se refresca solo cada 5 minutos
+ *  y al instante cuando el panel guarda un cambio. */
+export const revalidate = 300
+
 export async function generateStaticParams() {
   const productos = await obtenerProductos()
   return productos.map((p) => ({ slug: p.slug }))

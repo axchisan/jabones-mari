@@ -29,14 +29,13 @@ export const metadata: Metadata = {
     template: `%s · ${NEGOCIO.nombre}`,
   },
   description:
-    'Jabones de glicerina hechos a mano con avena, arroz, cúrcuma, romero y naranja. Desde $5.000. Domicilios en Bogotá. Pide por WhatsApp.',
+    'Jabones de glicerina artesanales, hechos a mano en Bogotá con ingredientes naturales. Pide por WhatsApp y coordinamos la entrega.',
   keywords: [
     'jabones artesanales bogotá',
     'jabón natural hecho a mano',
     'jabón de glicerina artesanal',
-    'jabón de avena',
-    'jabón de arroz',
-    'jabón de cúrcuma',
+    'jabón natural piel sensible',
+    'jabones artesanales domicilio bogotá',
   ],
   openGraph: {
     type: 'website',
@@ -45,8 +44,8 @@ export const metadata: Metadata = {
     url: SITIO_URL,
     title: `${NEGOCIO.nombre} · Jabones artesanales naturales en Bogotá`,
     description:
-      'Jabones de glicerina hechos a mano con ingredientes naturales. Desde $5.000, con domicilio en Bogotá.',
-    images: [{ url: '/hero-familia.jpg', width: 1376, height: 768, alt: 'Los seis jabones artesanales de Mari sobre mármol' }],
+      'Jabones de glicerina hechos a mano con ingredientes naturales, con domicilio en Bogotá.',
+    images: [{ url: '/hero-familia.jpg', width: 1376, height: 768, alt: 'Jabones artesanales de Mari sobre mármol' }],
   },
   alternates: { canonical: '/' },
 }

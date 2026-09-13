@@ -42,7 +42,10 @@ export const variantes = pgTable('variantes', {
   pesoGramos: integer('peso_gramos'),
   molde: text('molde'),
   sku: text('sku').notNull().unique(),
+  // null = no se lleva inventario; un número = unidades restantes
+  stock: integer('stock'),
   disponible: boolean('disponible').notNull().default(true),
+  orden: integer('orden').notNull().default(0),
 })
 
 export const pedidos = pgTable('pedidos', {

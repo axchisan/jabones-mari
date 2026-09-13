@@ -8,7 +8,9 @@ export type Variante = {
   pesoGramos: number | null
   molde: string
   sku: string
+  stock: number | null
   disponible: boolean
+  orden: number
 }
 
 export type Imagen = {
