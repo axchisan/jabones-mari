@@ -130,3 +130,7 @@ Estas cinco cosas necesito que las confirmen ustedes, no las puedo inventar:
 | `04-arquitectura.md` | Stack, modelo de datos, flujo de pedido, seguridad, deploy. |
 | `05-prompts-gemini.md` | Prompts listos para copiar y generar todas las imágenes. |
 | `06-seo.md` | Estrategia de posicionamiento local y contenido. |
+| `07-google-oauth.md` | Configurar el ingreso con Google, paso a paso. |
+| `08-despliegue.md` | Publicar en producción, CI/CD, dominio y variables. |
+| `09-search-console.md` | Search Console, indexación y medición. |
+| `10-publicidad.md` | Prompts para folletos, historias y carruseles. |

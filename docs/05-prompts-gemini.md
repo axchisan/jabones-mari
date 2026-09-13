@@ -220,81 +220,16 @@ Sin texto ni logos.
 
 ---
 
-## 6. Folletos publicitarios (estilo de las referencias)
+## 6. Folletos publicitarios
 
-### 6.1 La forma correcta de hacerlos
+> **Esta sección se movió.** Cuando se escribió esta guía, los modelos de imagen escribían mal
+> en español y la recomendación era generar solo el fondo y montar el texto aparte. Los modelos
+> actuales ya renderizan texto correctamente, así que las piezas se generan completas.
+>
+> Los prompts de folletos, historias, carruseles y portadas están ahora en
+> **[`10-publicidad.md`](10-publicidad.md)**, con el texto exacto de cada jabón tomado del
+> catálogo.
 
-Los modelos de imagen **todavía escriben mal en español** — devuelven "BENEFICOS", "HIDRATACION PROFUNDA" sin tilde o letras deformadas. Un folleto con una falta de ortografía destruye la percepción de calidad.
-
-**Método recomendado (el que da resultado profesional):**
-1. Genera con Gemini **solo la foto del producto** (sección 2).
-2. Arma el folleto con el texto encima en **Canva** (gratis) o con la plantilla HTML que incluye este proyecto (`web/src/app/admin/folletos`), que exporta el folleto ya listo a 1080×1080 px con la tipografía y la paleta correctas.
-
-Así el texto siempre sale perfecto, el logo es el real, y cambiar un precio toma 5 segundos.
-
-### 6.2 Prompt para generar el **fondo** del folleto
-
-```
-Diseño de fondo para una publicación cuadrada de Instagram (1080x1080) de una marca de
-jabones artesanales femenina y delicada.
-
-Fondo color crema cálido (#FDF9F5). En la mitad inferior, dos bandas horizontales
-superpuestas con textura de trazo de pincel de bordes irregulares: una banda gruesa en
-color [COLOR DEL PRODUCTO] y encima, desfasada, una banda más delgada en un tono más claro
-del mismo color.
-En el tercio superior, un marco de trazo de pincel irregular en el mismo color, que servirá
-para insertar después una fotografía.
-Esquinas con detalles muy sutiles de line art: una mariposa y ramitas florales en rosa pálido.
-Diseño limpio, mucho espacio libre, estilo cosmética natural artesanal.
-IMPORTANTE: sin ningún texto, sin letras, sin logos. Solo el diseño de fondo.
-```
-
-Reemplaza `[COLOR DEL PRODUCTO]` según la receta:
-| Producto | Color |
-|---|---|
-| Menta y romero | verde salvia `#7E9A7C` |
-| Arroz | arena perlada `#D9C7B4` |
-| Avena | avena tostada `#C9A87C` |
-| Arroz y avena | beige cálido `#D6B99A` |
-| Cúrcuma y miel | dorado `#C9A227` |
-| Naranja y coco | naranja suave `#E08A4B` |
-
-### 6.3 Contenido de cada folleto (para escribirlo encima)
-
-Estructura calcada de las referencias, que funciona:
-
-```
-[ FOTO DEL PRODUCTO con borde de pincel ]
-
-          MENTA Y ROMERO
-─────────────────────────────────────
- Tipo de piel: Mixta y grasa
- Peso: 100 gr    Uso: Corporal
-─────────────────────────────────────
-            BENEFICIOS
- ✓ Refresca y revitaliza    ✓ Purificante natural
- ✓ Controla la grasa        ✓ Efecto descongestionante
- ✓ Alivia pies cansados     ✓ Aroma energizante
-─────────────────────────────────────
- Grande $7.500 · Pequeño $5.000
- [logo Mari]     WhatsApp 3XX XXX XXXX
-```
-
-Los seis bloques de beneficios están en `03-catalogo.md`, listos para copiar.
-
-### 6.4 Prompt para historia de Instagram (9:16)
-```
-Diseño vertical 1080x1920 para historia de Instagram de una marca de jabones artesanales.
-Fondo crema cálido (#FDF9F5) con una gran mancha de acuarela rosa pálido en la parte
-superior y trazos de pincel rosa en la inferior.
-En el centro, un espacio circular limpio con borde de trazo de pincel rosa, preparado para
-insertar después la fotografía de un jabón.
-Detalles de line art muy finos en las esquinas: mariposas y ramitas florales, en rosa claro.
-Estilo delicado, femenino, artesanal, con mucho aire.
-Sin texto, sin letras, sin logos.
-```
-
----
 
 ## 7. Etiqueta y empaque (fase siguiente)
 
