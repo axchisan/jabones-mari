@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { crearPedido } from '@/lib/pedidos'
 import { nuevoPedidoSchema } from '@/lib/validacion'
 import { construirMensaje } from '@/lib/whatsapp'
+import { obtenerSesion } from '@/lib/auth/sesion'
 
 export async function POST(peticion: Request) {
   let cuerpo: unknown
@@ -25,7 +26,11 @@ export async function POST(peticion: Request) {
   const datos = resultado.data
 
   try {
+    // Si la clienta tiene sesión, el pedido queda en su historial.
+    const sesion = await obtenerSesion()
+
     const pedido = await crearPedido({
+      usuarioId: sesion?.user?.id ?? null,
       clienteNombre: datos.clienteNombre,
       telefono: datos.telefono,
       direccion: datos.direccion || null,

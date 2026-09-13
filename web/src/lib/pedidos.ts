@@ -1,19 +1,15 @@
 import 'server-only'
-import { promises as fs } from 'node:fs'
-import path from 'node:path'
 import { randomUUID } from 'node:crypto'
 import { desc, eq, sql } from 'drizzle-orm'
-import { db, hayBaseDeDatos, esquema } from '@/lib/db/cliente'
+import { db, esquema } from '@/lib/db/cliente'
 import type { EstadoPedido, ItemPedido, Pedido } from '@/lib/tipos'
 
-/**
- * Repositorio de pedidos.
- *
- * Con DATABASE_URL escribe en Postgres. Sin ella, guarda en un archivo local
- * para poder desarrollar y probar el flujo completo antes de conectar la base.
- */
+/** Repositorio de pedidos. La base de datos es la única fuente de verdad. */
 
-const ARCHIVO_LOCAL = path.join(process.cwd(), '.pedidos-dev.json')
+function baseDeDatos() {
+  if (!db) throw new Error('Falta DATABASE_URL: no hay dónde guardar los pedidos')
+  return db
+}
 
 type NuevoPedido = {
   clienteNombre: string
@@ -22,6 +18,7 @@ type NuevoPedido = {
   barrio?: string | null
   notas?: string | null
   items: ItemPedido[]
+  usuarioId?: string | null
 }
 
 export type CambiosPedido = Partial<
@@ -47,34 +44,19 @@ function codigoDesde(consecutivo: number): string {
   return `MARI-${String(consecutivo).padStart(4, '0')}`
 }
 
-/* ---------------------------------------------------------------- archivo */
-
-async function leerLocal(): Promise<Pedido[]> {
-  try {
-    const crudo = await fs.readFile(ARCHIVO_LOCAL, 'utf8')
-    const datos = JSON.parse(crudo) as Pedido[]
-    return datos.map((p) => ({
-      ...p,
-      creadoEn: new Date(p.creadoEn),
-      actualizadoEn: new Date(p.actualizadoEn),
-    }))
-  } catch {
-    return []
-  }
-}
-
-async function escribirLocal(pedidos: Pedido[]): Promise<void> {
-  await fs.writeFile(ARCHIVO_LOCAL, JSON.stringify(pedidos, null, 2), 'utf8')
-}
-
-/* ------------------------------------------------------------------- API */
-
 export async function crearPedido(entrada: NuevoPedido): Promise<Pedido> {
+  const conexion = baseDeDatos()
   const subtotal = calcularSubtotal(entrada.items)
   const ahora = new Date()
 
-  const base = {
+  const [{ conteo }] = await conexion
+    .select({ conteo: sql<number>`count(*)::int` })
+    .from(esquema.pedidos)
+
+  const pedido: Pedido = {
     id: randomUUID(),
+    codigo: codigoDesde(conteo + 1),
+    usuarioId: entrada.usuarioId ?? null,
     clienteNombre: entrada.clienteNombre,
     telefono: entrada.telefono,
     direccion: entrada.direccion ?? null,
@@ -85,49 +67,50 @@ export async function crearPedido(entrada: NuevoPedido): Promise<Pedido> {
     subtotal,
     domicilio: 0,
     total: subtotal,
+    // Nace abierto: la confirmación real ocurre en la conversación de WhatsApp.
     estado: 'abierto' as EstadoPedido,
     creadoEn: ahora,
     actualizadoEn: ahora,
   }
 
-  if (hayBaseDeDatos && db) {
-    const [{ conteo }] = await db
-      .select({ conteo: sql<number>`count(*)::int` })
-      .from(esquema.pedidos)
-    const pedido = { ...base, codigo: codigoDesde(conteo + 1) }
-    await db.insert(esquema.pedidos).values(pedido)
-    return pedido
-  }
-
-  const pedidos = await leerLocal()
-  const pedido = { ...base, codigo: codigoDesde(pedidos.length + 1) }
-  await escribirLocal([pedido, ...pedidos])
+  await conexion.insert(esquema.pedidos).values(pedido)
   return pedido
 }
 
 export async function listarPedidos(): Promise<Pedido[]> {
-  if (hayBaseDeDatos && db) {
-    const filas = await db
-      .select()
-      .from(esquema.pedidos)
-      .orderBy(desc(esquema.pedidos.creadoEn))
-    return filas as Pedido[]
-  }
-  const pedidos = await leerLocal()
-  return pedidos.sort((a, b) => b.creadoEn.getTime() - a.creadoEn.getTime())
+  const filas = await baseDeDatos()
+    .select()
+    .from(esquema.pedidos)
+    .orderBy(desc(esquema.pedidos.creadoEn))
+  return filas as Pedido[]
+}
+
+/** Los pedidos de una clienta con cuenta, para su historial. */
+export async function listarPedidosDeUsuario(usuarioId: string): Promise<Pedido[]> {
+  const filas = await baseDeDatos()
+    .select()
+    .from(esquema.pedidos)
+    .where(eq(esquema.pedidos.usuarioId, usuarioId))
+    .orderBy(desc(esquema.pedidos.creadoEn))
+  return filas as Pedido[]
 }
 
 export async function obtenerPedido(id: string): Promise<Pedido | null> {
-  if (hayBaseDeDatos && db) {
-    const [fila] = await db
-      .select()
-      .from(esquema.pedidos)
-      .where(eq(esquema.pedidos.id, id))
-      .limit(1)
-    return (fila as Pedido) ?? null
-  }
-  const pedidos = await leerLocal()
-  return pedidos.find((p) => p.id === id) ?? null
+  const [fila] = await baseDeDatos()
+    .select()
+    .from(esquema.pedidos)
+    .where(eq(esquema.pedidos.id, id))
+    .limit(1)
+  return (fila as Pedido) ?? null
+}
+
+export async function obtenerPedidoPorCodigo(codigo: string): Promise<Pedido | null> {
+  const [fila] = await baseDeDatos()
+    .select()
+    .from(esquema.pedidos)
+    .where(eq(esquema.pedidos.codigo, codigo))
+    .limit(1)
+  return (fila as Pedido) ?? null
 }
 
 export async function actualizarPedido(
@@ -151,37 +134,50 @@ export async function actualizarPedido(
     actualizadoEn: new Date(),
   }
 
-  if (hayBaseDeDatos && db) {
-    await db
-      .update(esquema.pedidos)
-      .set({
-        clienteNombre: actualizado.clienteNombre,
-        telefono: actualizado.telefono,
-        direccion: actualizado.direccion,
-        barrio: actualizado.barrio,
-        notas: actualizado.notas,
-        observacionesInternas: actualizado.observacionesInternas,
-        items: actualizado.items,
-        subtotal: actualizado.subtotal,
-        domicilio: actualizado.domicilio,
-        total: actualizado.total,
-        estado: actualizado.estado,
-        actualizadoEn: actualizado.actualizadoEn,
-      })
-      .where(eq(esquema.pedidos.id, id))
-    return actualizado
-  }
+  await baseDeDatos()
+    .update(esquema.pedidos)
+    .set({
+      clienteNombre: actualizado.clienteNombre,
+      telefono: actualizado.telefono,
+      direccion: actualizado.direccion,
+      barrio: actualizado.barrio,
+      notas: actualizado.notas,
+      observacionesInternas: actualizado.observacionesInternas,
+      items: actualizado.items,
+      subtotal: actualizado.subtotal,
+      domicilio: actualizado.domicilio,
+      total: actualizado.total,
+      estado: actualizado.estado,
+      actualizadoEn: actualizado.actualizadoEn,
+    })
+    .where(eq(esquema.pedidos.id, id))
 
-  const pedidos = await leerLocal()
-  await escribirLocal(pedidos.map((p) => (p.id === id ? actualizado : p)))
   return actualizado
 }
 
 export async function eliminarPedido(id: string): Promise<void> {
-  if (hayBaseDeDatos && db) {
-    await db.delete(esquema.pedidos).where(eq(esquema.pedidos.id, id))
-    return
+  await baseDeDatos().delete(esquema.pedidos).where(eq(esquema.pedidos.id, id))
+}
+
+/** Resumen para el tablero del panel. */
+export async function resumenPedidos() {
+  const conexion = baseDeDatos()
+  const filas = await conexion
+    .select({ estado: esquema.pedidos.estado, total: esquema.pedidos.total })
+    .from(esquema.pedidos)
+
+  const porEstado = new Map<string, number>()
+  let ventasConfirmadas = 0
+
+  for (const fila of filas) {
+    porEstado.set(fila.estado, (porEstado.get(fila.estado) ?? 0) + 1)
+    if (fila.estado === 'entregado') ventasConfirmadas += fila.total
   }
-  const pedidos = await leerLocal()
-  await escribirLocal(pedidos.filter((p) => p.id !== id))
+
+  return {
+    total: filas.length,
+    abiertos: porEstado.get('abierto') ?? 0,
+    porEstado,
+    ventasConfirmadas,
+  }
 }

@@ -81,6 +81,7 @@ export type ItemPedido = {
 export type Pedido = {
   id: string
   codigo: string
+  usuarioId: string | null
   clienteNombre: string
   telefono: string
   direccion: string | null

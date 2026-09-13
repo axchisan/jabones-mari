@@ -3,9 +3,10 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { ShoppingBag, Menu, X } from 'lucide-react'
+import { ShoppingBag, Menu, X, User } from 'lucide-react'
 import { Marca } from '@/components/marca'
 import { usarCarrito, unidadesDe } from '@/lib/carrito'
+import { useSession } from '@/lib/auth/cliente'
 import { cn } from '@/lib/utilidades'
 
 const ENLACES = [
@@ -21,6 +22,7 @@ export function Encabezado() {
   const hidratado = usarCarrito((e) => e.hidratado)
   const abrir = usarCarrito((e) => e.abrir)
   const [menuAbierto, setMenuAbierto] = useState(false)
+  const { data: sesion } = useSession()
 
   const unidades = unidadesDe(items)
 
@@ -63,6 +65,15 @@ export function Encabezado() {
           </nav>
 
           <div className="flex items-center gap-1">
+            <Link
+              href={sesion?.user ? '/mi-cuenta' : '/ingresar'}
+              className="grid size-10 place-items-center rounded-full text-tinta-media transition hover:bg-crema-hondo hover:text-rosa-hondo"
+              aria-label={sesion?.user ? 'Mi cuenta' : 'Ingresar a mi cuenta'}
+              title={sesion?.user ? 'Mi cuenta' : 'Ingresar'}
+            >
+              <User className="size-[1.15rem]" aria-hidden="true" />
+            </Link>
+
             <button
               type="button"
               onClick={abrir}
