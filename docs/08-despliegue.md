@@ -151,40 +151,68 @@ gh secret set DATABASE_URL --repo axchisan/jabones-mari
 `jabonesmari.shop` está registrado en Hostinger y hoy apunta a los servidores de parqueo
 (`dns-parking.com`). Hay dos caminos:
 
-### Opción A — Nameservers a Vercel (más simple)
+Los dos dominios ya están dados de alta en el proyecto (`jabonesmari.shop` y
+`www.jabonesmari.shop`). Falta apuntar el DNS, y eso se hace en Hostinger.
 
-1. En Vercel → *Settings* → *Domains* → agrega `jabonesmari.shop` y `www.jabonesmari.shop`.
-2. Vercel te dará dos nameservers (`ns1.vercel-dns.com` y `ns2.vercel-dns.com`).
-3. En Hostinger → *Dominios* → `jabonesmari.shop` → **DNS / Nameservers** → cambia los de
-   parqueo por los de Vercel.
-4. Espera la propagación (de minutos a 24 horas). El certificado HTTPS se emite solo.
+### Opción A — Registros DNS en Hostinger (la que recomienda Vercel)
 
-### Opción B — Registros DNS en Hostinger (sin cambiar nameservers)
-
-En Hostinger → *DNS / Nameservers* → *Administrar registros DNS*:
+En Hostinger → *Dominios* → `jabonesmari.shop` → **DNS / Nameservers** →
+*Administrar registros DNS*:
 
 | Tipo | Nombre | Valor |
 |---|---|---|
 | A | `@` | `76.76.21.21` |
 | CNAME | `www` | `cname.vercel-dns.com` |
 
-Vercel confirma los valores exactos al agregar el dominio — **usa los que te muestre él**,
-no estos de memoria, por si cambian.
+Deja intactos los registros `MX` si algún día quieres correo propio en el dominio.
 
-> **Recomendación:** la opción A, porque deja que Vercel gestione también los certificados y
-> las redirecciones de `www`. La B sirve si más adelante quieres correo propio en Hostinger
-> sin tocar nada más.
+### Opción B — Nameservers a Vercel
+
+En Hostinger, cambia los nameservers de parqueo por:
+
+```
+ns1.vercel-dns.com
+ns2.vercel-dns.com
+```
+
+Vercel pasa a gestionar todo el DNS del dominio. Más cómodo, pero si luego quieres correo
+propio hay que recrear los registros `MX` dentro de Vercel.
+
+> **Recomendación:** la opción A. Es la que sugiere Vercel, no toca el resto del DNS y deja
+> la puerta abierta al correo en Hostinger.
+
+Para ver en cualquier momento qué falta:
+
+```bash
+cd web && npx vercel domains inspect jabonesmari.shop
+```
+
+La propagación tarda de minutos a 24 horas. El certificado HTTPS se emite solo.
 
 ---
 
-## 8. Primer despliegue
+## 8. Desplegar
+
+El camino normal es **hacer push**: Vercel compila y publica solo.
 
 ```bash
-cd web
-npx vercel --prod
+git push origin main
 ```
 
-Después, cada `push` a `main` despliega solo.
+> ⚠️ **No lances `npx vercel --prod` desde dentro de `web/`.** Falla con
+> *"The specified Root Directory 'web' does not exist"*, porque sube esa carpeta como raíz
+> y luego busca `web/` dentro de ella. Si hace falta desplegar a mano, hazlo desde la raíz
+> del repositorio.
+
+> ⚠️ **Los commits deben ir firmados con un correo de la cuenta de GitHub** (aquí,
+> `leftyrancuentabot@gmail.com`). Si no, Vercel los bloquea con *"couldn't find a Git account
+> for the commit author"* y los despliegues quedan en estado `UNKNOWN`, con un build de 0 ms
+> y sin ningún log que lo explique. El motivo real solo se ve consultando la API:
+>
+> ```bash
+> curl -s -H "Authorization: Bearer $TOKEN" \
+>   "https://api.vercel.com/v6/deployments?projectId=$ID&limit=3" | jq '.deployments[].errorMessage'
+> ```
 
 **Justo después del primer despliegue:**
 
