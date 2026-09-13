@@ -3,16 +3,25 @@ import Link from 'next/link'
 import { X } from 'lucide-react'
 import { TarjetaProducto } from '@/components/tarjeta-producto'
 import { obtenerProductos, facetas } from '@/lib/catalogo'
+import { contarRecetas, textoTamanos, contarTamanos, textoDesde } from '@/lib/textos'
 import { cn } from '@/lib/utilidades'
 
-export const metadata: Metadata = {
-  title: 'Catálogo de jabones artesanales',
-  description:
-    'Conoce nuestras seis recetas naturales en tamaño grande y pequeño. Filtra por tipo de piel y por uso. Domicilios en Bogotá.',
-  alternates: { canonical: '/catalogo' },
+export async function generateMetadata(): Promise<Metadata> {
+  const productos = await obtenerProductos()
+  const desde = textoDesde(productos)
+
+  return {
+    title: 'Catálogo de jabones artesanales',
+    description: `Conoce nuestras ${contarRecetas(productos.length)} naturales en tamaño ${textoTamanos(productos)}${desde ? `, ${desde}` : ''}. Filtra por tipo de piel y por uso. Domicilios en Bogotá.`,
+    alternates: { canonical: '/catalogo' },
+  }
 }
 
 type Filtros = { piel?: string; uso?: string }
+
+/** El catálogo vive en la base de datos: se refresca solo cada 5 minutos
+ *  y al instante cuando el panel guarda un cambio. */
+export const revalidate = 300
 
 export default async function Catalogo({
   searchParams,
@@ -30,6 +39,10 @@ export default async function Catalogo({
   })
 
   const hayFiltros = Boolean(piel || uso)
+  const tamanos = contarTamanos(todos)
+  const titulo = tamanos
+    ? `${contarRecetas(todos.length)}, ${tamanos}`
+    : contarRecetas(todos.length)
 
   const enlaceCon = (cambio: Filtros) => {
     const params = new URLSearchParams()
@@ -44,12 +57,11 @@ export default async function Catalogo({
     <div className="mx-auto max-w-6xl px-4 py-10">
       <header className="flex flex-col gap-2">
         <span className="versalita text-rosa-hondo">Catálogo</span>
-        <h1 className="text-[clamp(2.2rem,6vw,3.2rem)] leading-tight">
-          Seis recetas, dos tamaños
+        <h1 className="text-[clamp(2.2rem,6vw,3.2rem)] leading-tight first-letter:uppercase">
+          {titulo}
         </h1>
         <p className="max-w-xl text-tinta-media">
-          Todos nuestros jabones vienen en presentación grande y pequeña. Elige
-          por tipo de piel o por lo que quieras que haga por ti.
+          Elige por tipo de piel o por lo que quieras que haga por ti.
         </p>
       </header>
 

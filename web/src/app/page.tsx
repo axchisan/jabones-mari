@@ -2,9 +2,13 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Leaf, HandHeart, Sparkles, ArrowRight } from 'lucide-react'
 import { TarjetaProducto } from '@/components/tarjeta-producto'
-import { obtenerProductos } from '@/lib/catalogo'
+import { obtenerProductos, obtenerDestacados } from '@/lib/catalogo'
+import {
+  contarRecetas,
+  ingredientesDestacados,
+  textoDesde,
+} from '@/lib/textos'
 import { NEGOCIO, SITIO_URL } from '@/lib/config'
-import { precio } from '@/lib/formato'
 
 const VALORES = [
   {
@@ -15,7 +19,7 @@ const VALORES = [
   {
     icono: Leaf,
     titulo: 'Ingredientes naturales',
-    texto: 'Avena, arroz, romero, cúrcuma, miel y naranja. Nada que no reconozcas.',
+    texto: 'Nada en la etiqueta que no puedas reconocer y nombrar.',
   },
   {
     icono: Sparkles,
@@ -49,9 +53,17 @@ function DatosEstructurados() {
   )
 }
 
+/** El catálogo vive en la base de datos: se refresca solo cada 5 minutos
+ *  y al instante cuando el panel guarda un cambio. */
+export const revalidate = 300
+
 export default async function Portada() {
   const productos = await obtenerProductos()
-  const destacados = productos.filter((p) => p.destacado).slice(0, 3)
+  const destacados = (await obtenerDestacados()).slice(0, 3)
+
+  const recetas = contarRecetas(productos.length)
+  const ingredientes = ingredientesDestacados(productos)
+  const desde = textoDesde(productos)
 
   return (
     <>
@@ -70,9 +82,9 @@ export default async function Portada() {
               <em className="text-rosa-hondo">con el alma</em>
             </h1>
             <p className="max-w-md text-[1.05rem] text-tinta-media">
-              Seis recetas de glicerina artesanal con avena, arroz, romero, cúrcuma,
-              miel y naranja. Hechos a mano, en tandas pequeñas, para piel que
-              agradece lo simple.
+              {recetas.charAt(0).toUpperCase() + recetas.slice(1)} de glicerina
+              artesanal con {ingredientes}. Hechos a mano, en tandas pequeñas,
+              para piel que agradece lo simple.
             </p>
             <div className="flex flex-wrap items-center gap-3">
               <Link
@@ -90,14 +102,15 @@ export default async function Portada() {
               </Link>
             </div>
             <p className="cifra text-sm text-tinta-tenue">
-              Desde {precio(5000)} · Pedidos por WhatsApp
+              {desde ? `${desde.charAt(0).toUpperCase()}${desde.slice(1)} · ` : ''}
+              Pedidos por WhatsApp
             </p>
           </div>
 
           <div className="relative overflow-hidden rounded-tarjeta shadow-elevada">
             <Image
               src="/hero-familia.jpg"
-              alt="Los seis jabones artesanales de Mari sobre una tabla de mármol, rodeados de romero, arroz, avena y naranja"
+              alt="Jabones artesanales de Mari sobre una tabla de mármol, rodeados de romero, arroz, avena y naranja"
               width={1376}
               height={768}
               priority
@@ -141,7 +154,7 @@ export default async function Portada() {
             href="/catalogo"
             className="inline-flex items-center gap-1.5 text-sm font-semibold text-rosa-hondo hover:underline"
           >
-            Ver los seis
+            Ver el catálogo completo
             <ArrowRight className="size-4" aria-hidden="true" />
           </Link>
         </div>
