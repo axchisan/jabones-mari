@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ClipboardList, Package, EyeOff, AlertTriangle, ArrowRight } from 'lucide-react'
+import { ClipboardList, Package, AlertTriangle, ArrowRight } from 'lucide-react'
 import { EtiquetaEstado } from '@/components/tarjeta-pedido'
 import { obtenerTodosLosProductos } from '@/lib/catalogo'
 import { listarPedidos } from '@/lib/pedidos'
