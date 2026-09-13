@@ -68,7 +68,7 @@ export function FormularioPedido() {
       vaciar()
 
       // En móvil los bloqueadores matan window.open: se navega en la misma pestaña.
-      window.location.href = enlace
+      window.location.assign(enlace)
     } catch {
       setErrorGeneral('Revisa tu conexión e intenta de nuevo.')
     }
