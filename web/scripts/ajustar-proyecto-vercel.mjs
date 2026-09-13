@@ -16,6 +16,13 @@ import path from 'node:path'
 
 const RAIZ = 'web'
 
+/**
+ * La tienda es pública, así que producción no puede quedar detrás del SSO
+ * de Vercel. Las previsualizaciones sí se protegen: son borradores y no
+ * deberían ser visitables ni indexables por cualquiera.
+ */
+const PROTECCION = { deploymentType: 'preview' }
+
 function leerSesionDelCli() {
   const base = path.join(
     homedir(),
@@ -57,7 +64,7 @@ const respuesta = await fetch(url, {
     Authorization: `Bearer ${token}`,
     'Content-Type': 'application/json',
   },
-  body: JSON.stringify({ rootDirectory: RAIZ }),
+  body: JSON.stringify({ rootDirectory: RAIZ, ssoProtection: PROTECCION }),
 })
 
 if (!respuesta.ok) {
@@ -71,4 +78,8 @@ const proyecto = await respuesta.json()
 console.log(`Proyecto:        ${proyecto.name}`)
 console.log(`Root Directory:  ${proyecto.rootDirectory ?? '.'}`)
 console.log(`Framework:       ${proyecto.framework ?? '(sin definir)'}`)
+console.log(
+  `Protección SSO:  ${proyecto.ssoProtection?.deploymentType ?? 'ninguna'} ` +
+    '(producción queda pública)',
+)
 console.log('\nListo. El próximo despliegue ya compilará desde esa carpeta.')
