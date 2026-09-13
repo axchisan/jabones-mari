@@ -125,13 +125,70 @@ Ve a **Google Auth Platform → Información de la marca** (*Branding*) y comple
 
 ### Verificar el dominio ante Google
 
-1. Entra a [Search Console](https://search.google.com/search-console) **con la misma cuenta de
-   Google** con la que creaste el proyecto.
-2. Agrega la propiedad `jabonesmari.shop` (tipo *Dominio*).
-3. Añade en Hostinger el registro `TXT` que te dé, y pulsa verificar.
+Si no lo haces, Google rechaza la marca con este mensaje:
 
-Una vez verificado, el dominio aparece disponible en *Dominios autorizados* de la pantalla de
-consentimiento.
+> *El sitio web de la URL de tu página principal "https://jabonesmari.shop" no está registrado
+> a tu nombre. Verifica la propiedad de tu página principal.*
+
+Hay dos formas. **Las dos requieren la misma cuenta de Google con la que creaste el proyecto.**
+
+#### Opción A — Etiqueta HTML (el sitio ya está preparado)
+
+1. Entra a [Search Console](https://search.google.com/search-console).
+2. Agrega la propiedad con **Prefijo de URL**: `https://jabonesmari.shop`.
+3. Elige el método **Etiqueta HTML**. Te dará algo así:
+
+   ```html
+   <meta name="google-site-verification" content="AbC123_ejemplo-de-codigo" />
+   ```
+
+4. Copia **solo el contenido** (`AbC123_ejemplo-de-codigo`, sin la etiqueta) y ponlo en
+   `web/.env.local`:
+
+   ```bash
+   GOOGLE_SITE_VERIFICATION=AbC123_ejemplo-de-codigo
+   ```
+
+5. Súbelo a producción y despliega:
+
+   ```bash
+   cd web && node scripts/subir-variables.mjs
+   git commit --allow-empty -m "Publica la verificación de Google" && git push
+   ```
+
+6. Cuando el despliegue termine, vuelve a Search Console y pulsa **Verificar**.
+
+#### Opción B — Registro TXT en Hostinger (más rápido)
+
+En Search Console elige la propiedad de tipo **Dominio** y copia el registro `TXT` que te dé.
+En Hostinger → *DNS / Nameservers* tienes el atajo **Verificación de sitio de Google**, que lo
+agrega solo. Tarda unos minutos en propagar.
+
+> La opción B verifica el dominio entero (con y sin `www`, y cualquier subdominio), así que es
+> la más completa. La A solo verifica `https://jabonesmari.shop`, que para este caso basta.
+
+Una vez verificado, vuelve a *Información de la marca*, pulsa **Corregí los problemas** y envía
+de nuevo.
+
+---
+
+## El aviso de "Tu app requiere una verificación"
+
+Ese aviso aparece **solo porque subiste un logotipo**. Google exige revisar la marca antes de
+mostrar un logo propio en la pantalla de consentimiento.
+
+**El ingreso con Google funciona igual mientras tanto**, esté o no verificada la marca: lo único
+que cambia es que la pantalla muestra el dominio en lugar del logo.
+
+Tienes dos caminos:
+
+| | Qué pasa |
+|---|---|
+| **Dejar el logo y verificar** | Hay que verificar el dominio (arriba) y esperar la revisión de Google, que puede tardar días. Al final, la pantalla muestra el logo de Mari. |
+| **Quitar el logo** | *Información de la marca* → **Quitar** bajo el logotipo. El aviso desaparece, no hace falta ninguna revisión y el ingreso sigue funcionando igual. |
+
+Para una tienda que empieza, **quitar el logo es lo pragmático**: nadie deja de comprar porque la
+ventana de Google no muestre la mariposa. Se puede subir más adelante, con calma.
 
 ---
 
