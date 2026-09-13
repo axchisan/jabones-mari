@@ -1,0 +1,44 @@
+name: Migraciones de base de datos
+
+# Las migraciones NO corren solas al desplegar: un cambio de esquema puede
+# borrar datos, así que se lanza a mano y queda registrado quién lo hizo.
+on:
+  workflow_dispatch:
+    inputs:
+      confirmar:
+        description: 'Escribe "aplicar" para confirmar'
+        required: true
+        default: ''
+
+defaults:
+  run:
+    working-directory: web
+
+jobs:
+  migrar:
+    name: Aplicar migraciones pendientes
+    runs-on: ubuntu-latest
+    environment: produccion
+    timeout-minutes: 10
+
+    steps:
+      - name: Comprobar la confirmación
+        if: inputs.confirmar != 'aplicar'
+        run: |
+          echo "Para aplicar las migraciones hay que escribir 'aplicar'."
+          exit 1
+
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - run: npm ci
+
+      - name: Aplicar migraciones
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: npx drizzle-kit migrate

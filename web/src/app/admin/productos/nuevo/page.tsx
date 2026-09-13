@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import { FormularioProducto } from '@/components/admin/formulario-producto'
 import { listarImagenesDisponibles } from '@/lib/admin/imagenes'
+import { hayAlmacenamiento } from '@/lib/almacenamiento/r2'
 
 export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Nuevo producto' }
@@ -25,7 +26,7 @@ export default async function NuevoProducto() {
         </p>
       </div>
 
-      <FormularioProducto imagenesDisponibles={imagenes} />
+      <FormularioProducto imagenesDisponibles={imagenes} puedeSubir={hayAlmacenamiento} />
     </div>
   )
 }

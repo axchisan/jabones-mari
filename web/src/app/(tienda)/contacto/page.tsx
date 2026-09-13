@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { MessageCircle, MapPin, Clock } from 'lucide-react'
 import { NEGOCIO, DOMICILIO, enlaceWhatsApp } from '@/lib/config'
+import { DatosEstructurados, preguntasFrecuentes, migasDePan } from '@/lib/seo'
 import { telefonoLegible } from '@/lib/formato'
 
 export const metadata: Metadata = {
@@ -11,9 +12,46 @@ export const metadata: Metadata = {
   alternates: { canonical: '/contacto' },
 }
 
+const PREGUNTAS = [
+  {
+    pregunta: '¿Cómo pago?',
+    respuesta:
+      'Por ahora no cobramos en línea. Armas tu pedido en la página, te llevamos al chat y ahí acordamos el medio de pago y la entrega.',
+  },
+  {
+    pregunta: '¿Los jabones sirven para el rostro?',
+    respuesta:
+      'Depende de la receta. En cada ficha decimos si el uso es facial, corporal o ambos. Arroz, avena y cúrcuma y miel son los más usados para rostro.',
+  },
+  {
+    pregunta: '¿Hacen combos para eventos o detalles?',
+    respuesta:
+      'Sí. Armamos sets con bolsa de organza y tarjeta. Escríbenos con la cantidad y la fecha y te cotizamos.',
+  },
+  {
+    pregunta: '¿Tienen fragancia artificial?',
+    respuesta:
+      'No. El aroma viene del propio ingrediente: romero, menta, naranja, miel. El de arroz es prácticamente neutro.',
+  },
+  {
+    pregunta: '¿Hacen envíos fuera de Bogotá?',
+    respuesta:
+      'Por ahora entregamos en Bogotá. Si estás en otra ciudad, escríbenos y miramos qué podemos hacer.',
+  },
+]
+
 export default function Contacto() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-12">
+      <DatosEstructurados
+        datos={[
+          preguntasFrecuentes(PREGUNTAS),
+          migasDePan([
+            { nombre: 'Inicio', ruta: '/' },
+            { nombre: 'Contacto', ruta: '/contacto' },
+          ]),
+        ]}
+      />
       <header className="flex flex-col gap-3">
         <span className="versalita text-rosa-hondo">Contacto</span>
         <h1 className="text-[clamp(2.2rem,6vw,3.2rem)] leading-tight">
@@ -63,24 +101,7 @@ export default function Contacto() {
       <section className="mt-10">
         <h2 className="text-2xl">Preguntas frecuentes</h2>
         <div className="mt-4 flex flex-col gap-2">
-          {[
-            {
-              p: '¿Cómo pago?',
-              r: 'Por ahora no cobramos en línea. Armas tu pedido en la página, te llevamos al chat y ahí acordamos el medio de pago y la entrega.',
-            },
-            {
-              p: '¿Los jabones sirven para el rostro?',
-              r: 'Depende de la receta. En cada ficha decimos si el uso es facial, corporal o ambos. Arroz, avena y cúrcuma y miel son los más usados para rostro.',
-            },
-            {
-              p: '¿Hacen combos para eventos o detalles?',
-              r: 'Sí. Armamos sets con bolsa de organza y tarjeta. Escríbenos con la cantidad y la fecha y te cotizamos.',
-            },
-            {
-              p: '¿Tienen fragancia artificial?',
-              r: 'No. El aroma viene del propio ingrediente: romero, menta, naranja, miel. El de arroz es prácticamente neutro.',
-            },
-          ].map(({ p, r }) => (
+          {PREGUNTAS.map(({ pregunta: p, respuesta: r }) => (
             <details
               key={p}
               className="group rounded-suave border border-linea bg-white px-5 py-4"

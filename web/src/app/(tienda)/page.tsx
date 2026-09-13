@@ -8,7 +8,7 @@ import {
   ingredientesDestacados,
   textoDesde,
 } from '@/lib/textos'
-import { NEGOCIO, SITIO_URL } from '@/lib/config'
+import { DatosEstructurados, negocioLocal, sitioWeb } from '@/lib/seo'
 
 const VALORES = [
   {
@@ -28,31 +28,6 @@ const VALORES = [
   },
 ]
 
-function DatosEstructurados() {
-  const datos = {
-    '@context': 'https://schema.org',
-    '@type': 'LocalBusiness',
-    name: NEGOCIO.nombre,
-    description: NEGOCIO.descripcion,
-    image: `${SITIO_URL}/hero-familia.jpg`,
-    url: SITIO_URL,
-    telephone: `+${NEGOCIO.whatsapp}`,
-    address: {
-      '@type': 'PostalAddress',
-      addressLocality: NEGOCIO.ciudad,
-      addressCountry: 'CO',
-    },
-    areaServed: { '@type': 'City', name: NEGOCIO.ciudad },
-    priceRange: '$5.000 - $7.500 COP',
-  }
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(datos) }}
-    />
-  )
-}
-
 /** El catálogo vive en la base de datos: se refresca solo cada 5 minutos
  *  y al instante cuando el panel guarda un cambio. */
 export const revalidate = 300
@@ -67,7 +42,7 @@ export default async function Portada() {
 
   return (
     <>
-      <DatosEstructurados />
+      <DatosEstructurados datos={[negocioLocal(), sitioWeb()]} />
 
       {/* ---------- Portada ---------- */}
       <section className="relative overflow-hidden border-b border-linea bg-crema-hondo">

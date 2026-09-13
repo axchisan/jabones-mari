@@ -10,7 +10,7 @@
 | Base de datos | **Neon Postgres** (integración de Vercel Marketplace, free tier) | Postgres de verdad, gratis, con *scale-to-zero*: no cobra cuando nadie visita. Se conecta a Vercel con variables de entorno automáticas. |
 | ORM | **Drizzle ORM** | Ligero, tipado, migraciones en SQL legible. Prisma también sirve; Drizzle arranca más rápido en funciones serverless. |
 | Imágenes del catálogo | `web/public/productos/` + `next/image` | Son ~20 imágenes fijas generadas con IA. Servirlas desde el repo es gratis, instantáneo y versionado. |
-| Imágenes subidas desde el panel | **Vercel Blob** | Cuando la prima suba una foto nueva desde el celular, va a Blob y queda con URL pública. |
+| Imágenes subidas desde el panel | **Cloudflare R2** | 10 GB gratis y sin costo de tráfico de salida, que es lo que consume una tienda de fotos. API de S3, así que es portable. |
 | Estado del carrito | **Zustand + localStorage** | El carrito vive en el navegador de la clienta. Cero servidor, cero costo, sobrevive a cerrar la pestaña. |
 | Autenticación del panel | Cookie de sesión firmada + contraseña con `bcrypt` | Son 1–2 personas. Meter Clerk/Auth0 aquí es sobre-ingeniería. Migrable después sin tocar el resto. |
 | Formularios | React Hook Form + Zod | Validación del teléfono y la dirección antes de armar el mensaje de WhatsApp. |
@@ -270,4 +270,5 @@ Cada `git push` a `main` despliega a producción; cada rama genera una URL de pr
 | `ADMIN_PASSWORD_HASH` | Hash bcrypt de la contraseña del panel. |
 | `NEXT_PUBLIC_WHATSAPP_NUMBER` | `573XXXXXXXXX`, sin `+` ni espacios. |
 | `NEXT_PUBLIC_SITE_URL` | Para canónicas, sitemap y Open Graph. |
-| `BLOB_READ_WRITE_TOKEN` | Subida de fotos desde el panel. |
+| `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET` | Subida de fotos desde el panel. |
+| `NEXT_PUBLIC_R2_PUBLIC_URL` | Dirección pública desde donde se sirven esas fotos. |
