@@ -6,7 +6,8 @@ import { Check, AlertCircle, ArrowLeft } from 'lucide-react'
 import { SelectorCompra } from '@/components/selector-compra'
 import { TarjetaProducto } from '@/components/tarjeta-producto'
 import { obtenerProducto, obtenerProductos } from '@/lib/catalogo'
-import { NEGOCIO, SITIO_URL } from '@/lib/config'
+import { NEGOCIO } from '@/lib/config'
+import { DatosEstructurados, fichaDeProducto, migasDePan } from '@/lib/seo'
 
 /** El catálogo vive en la base de datos: se refresca solo cada 5 minutos
  *  y al instante cuando el panel guarda un cambio. */
@@ -53,33 +54,18 @@ export default async function FichaProducto({
   const todos = await obtenerProductos()
   const relacionados = todos.filter((p) => p.slug !== producto.slug).slice(0, 3)
 
-  const datosEstructurados = {
-    '@context': 'https://schema.org',
-    '@type': 'Product',
-    name: `Jabón artesanal de ${producto.nombre}`,
-    description: producto.descripcion,
-    image: producto.imagenes.map((i) => `${SITIO_URL}${i.url}`),
-    brand: { '@type': 'Brand', name: NEGOCIO.nombreCorto },
-    category: 'Jabón artesanal',
-    offers: producto.variantes.map((v) => ({
-      '@type': 'Offer',
-      name: v.tamano === 'grande' ? 'Tamaño grande' : 'Tamaño pequeño',
-      sku: v.sku,
-      price: v.precio,
-      priceCurrency: 'COP',
-      availability: v.disponible
-        ? 'https://schema.org/InStock'
-        : 'https://schema.org/OutOfStock',
-      url: `${SITIO_URL}/producto/${producto.slug}`,
-      areaServed: NEGOCIO.ciudad,
-    })),
-  }
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(datosEstructurados) }}
+      <DatosEstructurados
+        datos={[
+          fichaDeProducto(producto),
+          migasDePan([
+            { nombre: 'Inicio', ruta: '/' },
+            { nombre: 'Catálogo', ruta: '/catalogo' },
+            { nombre: producto.nombre, ruta: `/producto/${producto.slug}` },
+          ]),
+        ]}
       />
 
       <Link

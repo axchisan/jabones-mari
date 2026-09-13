@@ -60,10 +60,10 @@ La web ataca los cuatro puntos: catálogo visual, carrito, pedido pre-armado que
 | Componente | Servicio | Plan | Costo |
 |---|---|---|---|
 | Hosting + CDN + SSL | Vercel Hobby | Gratis | $0 |
-| Dominio | `jabonesmari.vercel.app` | Incluido | $0 |
+| Dominio | `jabonesmari.shop` (Hostinger) | Anual | ~$40.000 COP/año |
 | Base de datos | Neon Postgres (free tier) | Gratis | $0 |
 | Imágenes del catálogo | Repositorio + optimizador de Next.js | Gratis | $0 |
-| Fotos subidas desde el panel | Vercel Blob (free tier) | Gratis | $0 |
+| Fotos subidas desde el panel | Cloudflare R2 (10 GB gratis) | Gratis | $0 |
 | Generación de imágenes | Google AI Studio / Gemini | Gratis (cuota diaria) | $0 |
 | Analítica | Vercel Web Analytics + Google Search Console | Gratis | $0 |
 | Ficha en Google Maps | Google Business Profile | Gratis | $0 |

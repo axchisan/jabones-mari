@@ -1,0 +1,51 @@
+name: Verificación
+
+# Cada cambio se revisa antes de llegar a producción. Vercel despliega solo
+# al hacer push; esto es la red que evita publicar algo que no compila.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: web
+
+jobs:
+  verificar:
+    name: Tipos, estilo y compilación
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Revisar tipos
+        run: npx tsc --noEmit
+
+      - name: Revisar estilo
+        run: npx eslint src --max-warnings 0
+
+      - name: Compilar
+        # Valores de relleno: la compilación no toca la base ni manda correos,
+        # pero el código espera que las variables existan.
+        env:
+          DATABASE_URL: postgresql://usuario:clave@localhost:5432/relleno
+          BETTER_AUTH_SECRET: relleno-solo-para-compilar-en-ci-0000000
+          NEXT_PUBLIC_SITE_URL: https://jabonesmari.shop
+          NEXT_PUBLIC_WHATSAPP_NUMBER: "573212881565"
+        run: npm run build

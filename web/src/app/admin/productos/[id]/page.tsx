@@ -5,6 +5,7 @@ import { FormularioProducto } from '@/components/admin/formulario-producto'
 import { Presentaciones } from '@/components/admin/variantes'
 import { obtenerProductoPorId } from '@/lib/catalogo'
 import { listarImagenesDisponibles } from '@/lib/admin/imagenes'
+import { hayAlmacenamiento } from '@/lib/almacenamiento/r2'
 
 export const dynamic = 'force-dynamic'
 
@@ -43,7 +44,11 @@ export default async function EditarProducto({
 
       <Presentaciones productoId={producto.id} variantes={producto.variantes} />
 
-      <FormularioProducto producto={producto} imagenesDisponibles={imagenes} />
+      <FormularioProducto
+        producto={producto}
+        imagenesDisponibles={imagenes}
+        puedeSubir={hayAlmacenamiento}
+      />
     </div>
   )
 }

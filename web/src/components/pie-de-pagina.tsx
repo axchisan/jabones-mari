@@ -17,6 +17,8 @@ const SECCIONES = [
     enlaces: [
       { href: '/nosotros', texto: 'Nuestra historia' },
       { href: '/contacto', texto: 'Contacto y pedidos' },
+      { href: '/terminos', texto: 'Términos y condiciones' },
+      { href: '/privacidad', texto: 'Política de privacidad' },
     ],
   },
 ]

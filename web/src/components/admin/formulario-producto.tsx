@@ -10,6 +10,7 @@ import {
   eliminarProducto,
   type ResultadoAccion,
 } from '@/lib/admin/acciones-productos'
+import { SubidorFoto } from '@/components/admin/subidor-foto'
 import type { Producto } from '@/lib/tipos'
 import { cn } from '@/lib/utilidades'
 
@@ -20,9 +21,11 @@ const USOS_SUGERIDOS = ['Facial', 'Corporal']
 export function FormularioProducto({
   producto,
   imagenesDisponibles,
+  puedeSubir,
 }: {
   producto?: Producto
   imagenesDisponibles: string[]
+  puedeSubir: boolean
 }) {
   const router = useRouter()
   const esNuevo = !producto
@@ -47,6 +50,10 @@ export function FormularioProducto({
     setImagenes((actuales) =>
       actuales.includes(url) ? actuales.filter((u) => u !== url) : [...actuales, url],
     )
+  }
+
+  function agregarImagen(url: string) {
+    setImagenes((actuales) => (actuales.includes(url) ? actuales : [...actuales, url]))
   }
 
   return (
@@ -279,6 +286,12 @@ export function FormularioProducto({
           </ol>
         )}
 
+        <SubidorFoto
+          nombreBase={producto?.slug ?? 'jabon'}
+          habilitado={puedeSubir}
+          alSubir={agregarImagen}
+        />
+
         <details className="rounded-suave border border-linea bg-crema px-4 py-3">
           <summary className="cursor-pointer text-sm font-semibold">
             Elegir de las fotos disponibles ({imagenesDisponibles.length})
@@ -311,11 +324,6 @@ export function FormularioProducto({
           </ul>
         </details>
 
-        <p className="text-xs text-tinta-tenue">
-          Para agregar fotos nuevas al listado, súbelas a{' '}
-          <code className="rounded bg-crema px-1">web/public/productos/</code>. La subida desde
-          el celular se habilita al publicar el sitio.
-        </p>
       </Bloque>
 
       {/* ---------- Visibilidad ---------- */}
