@@ -7,6 +7,7 @@ import {
   timestamp,
 } from 'drizzle-orm/pg-core'
 import type { ItemPedido, Imagen, EstadoPedido, Tamano } from '@/lib/tipos'
+import { usuarios } from './esquema-auth'
 
 export const productos = pgTable('productos', {
   id: text('id').primaryKey(),
@@ -51,6 +52,8 @@ export const variantes = pgTable('variantes', {
 export const pedidos = pgTable('pedidos', {
   id: text('id').primaryKey(),
   codigo: text('codigo').notNull().unique(),
+  // Null cuando el pedido se hizo sin cuenta: el carrito nunca obliga a registrarse.
+  usuarioId: text('usuario_id').references(() => usuarios.id, { onDelete: 'set null' }),
   clienteNombre: text('cliente_nombre').notNull(),
   telefono: text('telefono').notNull(),
   direccion: text('direccion'),
@@ -74,3 +77,5 @@ export const ajustes = pgTable('ajustes', {
   clave: text('clave').primaryKey(),
   valor: jsonb('valor').notNull(),
 })
+
+export * from './esquema-auth'
