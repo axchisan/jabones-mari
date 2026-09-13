@@ -92,12 +92,21 @@ Wrangler no puede crear estas llaves; hay que hacerlo en el panel. Son 2 minutos
 ## 5. Crear el proyecto en Vercel
 
 ```bash
-cd /Users/mac/Documents/Dev/Apps/JabonesMari
-npx vercel link
+cd web
+npx vercel link --yes --project jabones-mari
 ```
 
-Cuando pregunte por el directorio del código, responde **`web`** (el repositorio tiene la
-app en una subcarpeta).
+> ⚠️ **El paso que se olvida.** Vercel crea el proyecto apuntando a la raíz del
+> repositorio, pero aquí la aplicación vive en `web/`. Sin corregirlo, los despliegues
+> terminan en 0 ms sin compilar nada y sin dejar ningún log que lo explique.
+>
+> El CLI no tiene comando para cambiarlo. Se corrige con:
+>
+> ```bash
+> node scripts/ajustar-proyecto-vercel.mjs
+> ```
+>
+> o a mano en Vercel → *Settings* → *Build & Deployment* → **Root Directory** → `web`.
 
 ---
 
@@ -120,15 +129,20 @@ En Vercel → *Settings* → *Environment Variables*, para el entorno **Producti
 | `GOOGLE_CLIENT_ID` | Opcional, ver `07-google-oauth.md` |
 | `GOOGLE_CLIENT_SECRET` | Opcional, ver `07-google-oauth.md` |
 
-O desde la terminal, una por una:
+O de una vez, leyendo de `.env.local` y completando los valores de producción:
 
 ```bash
 cd web
-npx vercel env add DATABASE_URL production
+node scripts/subir-variables.mjs
 ```
 
+El script nunca imprime los valores: solo dice cuáles subió y cuáles siguen sin definir.
+
 **En GitHub** hace falta además un secreto para el workflow de migraciones:
-*Settings → Secrets and variables → Actions → New repository secret* → `DATABASE_URL`.
+
+```bash
+gh secret set DATABASE_URL --repo axchisan/jabones-mari
+```
 
 ---
 
