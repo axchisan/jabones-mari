@@ -8,6 +8,7 @@ import { TarjetaProducto } from '@/components/tarjeta-producto'
 import { obtenerProducto, obtenerProductos } from '@/lib/catalogo'
 import { NEGOCIO } from '@/lib/config'
 import { DatosEstructurados, fichaDeProducto, migasDePan } from '@/lib/seo'
+import { textoDesde } from '@/lib/textos'
 
 /** El catálogo vive en la base de datos: se refresca solo cada 5 minutos
  *  y al instante cuando el panel guarda un cambio. */
@@ -28,7 +29,21 @@ export async function generateMetadata({
   if (!producto) return { title: 'Jabón no encontrado' }
 
   const titulo = `Jabón de ${producto.nombre} artesanal`
-  const descripcion = `${producto.beneficios.slice(0, 3).join(', ')}. Hecho a mano con ingredientes naturales. Grande $7.500 · Pequeño $5.000.`
+
+  // La descripción se arma del propio producto: si cambian el precio o los
+  // beneficios desde el panel, lo que ve Google cambia con ellos.
+  const beneficios = producto.beneficios.slice(0, 3).join(', ').toLowerCase()
+  const desde = textoDesde([producto])
+
+  const descripcion = [
+    producto.claim && `${producto.claim}.`,
+    beneficios && `${beneficios.charAt(0).toUpperCase()}${beneficios.slice(1)}.`,
+    'Hecho a mano en Bogotá con ingredientes naturales.',
+    desde && `${desde.charAt(0).toUpperCase()}${desde.slice(1)}.`,
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .slice(0, 155)
 
   return {
     title: titulo,
