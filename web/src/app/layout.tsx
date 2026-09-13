@@ -5,6 +5,7 @@ import { Encabezado } from '@/components/encabezado'
 import { PieDePagina } from '@/components/pie-de-pagina'
 import { CajonCarrito } from '@/components/cajon-carrito'
 import { BotonWhatsappFlotante } from '@/components/boton-whatsapp'
+import { RegistroServiceWorker } from '@/components/registro-sw'
 import { NEGOCIO, SITIO_URL } from '@/lib/config'
 
 const display = Instrument_Serif({
@@ -71,6 +72,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <PieDePagina />
         <CajonCarrito />
         <BotonWhatsappFlotante />
+        <RegistroServiceWorker />
       </body>
     </html>
   )
