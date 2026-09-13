@@ -51,6 +51,13 @@ export const metadata: Metadata = {
     ],
   },
   alternates: { canonical: '/' },
+
+  // Verificación de propiedad del dominio ante Google. Hace falta para
+  // Search Console y para que Google acepte este dominio en la pantalla de
+  // consentimiento del ingreso con Google.
+  verification: process.env.GOOGLE_SITE_VERIFICATION
+    ? { google: process.env.GOOGLE_SITE_VERIFICATION }
+    : undefined,
 }
 
 export const viewport: Viewport = {
