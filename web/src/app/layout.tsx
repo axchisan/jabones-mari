@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Instrument_Serif, Karla } from 'next/font/google'
 import './globals.css'
+import { Analytics } from '@vercel/analytics/next'
 import { RegistroServiceWorker } from '@/components/registro-sw'
 import { NEGOCIO, SITIO_URL } from '@/lib/config'
 
@@ -77,6 +78,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="flex min-h-dvh flex-col">
         {children}
         <RegistroServiceWorker />
+        {/* Visitas y páginas más vistas, sin cookies ni datos personales:
+            por eso la tienda no necesita banner de consentimiento. */}
+        <Analytics />
       </body>
     </html>
   )
