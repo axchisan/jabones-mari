@@ -1,10 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { Instrument_Serif, Karla } from 'next/font/google'
 import './globals.css'
-import { Encabezado } from '@/components/encabezado'
-import { PieDePagina } from '@/components/pie-de-pagina'
-import { CajonCarrito } from '@/components/cajon-carrito'
-import { BotonWhatsappFlotante } from '@/components/boton-whatsapp'
 import { RegistroServiceWorker } from '@/components/registro-sw'
 import { NEGOCIO, SITIO_URL } from '@/lib/config'
 
@@ -45,7 +41,14 @@ export const metadata: Metadata = {
     title: `${NEGOCIO.nombre} · Jabones artesanales naturales en Bogotá`,
     description:
       'Jabones de glicerina hechos a mano con ingredientes naturales, con domicilio en Bogotá.',
-    images: [{ url: '/hero-familia.jpg', width: 1376, height: 768, alt: 'Jabones artesanales de Mari sobre mármol' }],
+    images: [
+      {
+        url: '/hero-familia.jpg',
+        width: 1376,
+        height: 768,
+        alt: 'Jabones artesanales de Mari sobre mármol',
+      },
+    ],
   },
   alternates: { canonical: '/' },
 }
@@ -54,23 +57,18 @@ export const viewport: Viewport = {
   themeColor: '#e07fae',
 }
 
+/**
+ * Layout raíz: solo el documento y las fuentes.
+ *
+ * La tienda y el panel son dos aplicaciones distintas con su propia
+ * envoltura — ver (tienda)/layout.tsx y admin/layout.tsx. Así el panel
+ * nunca carga el encabezado, el carrito ni el botón de WhatsApp.
+ */
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es" className={`${display.variable} ${texto.variable}`}>
       <body className="flex min-h-dvh flex-col">
-        <a
-          href="#contenido"
-          className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-full focus:bg-tinta focus:px-5 focus:py-2 focus:text-sm focus:text-crema"
-        >
-          Saltar al contenido
-        </a>
-        <Encabezado />
-        <main id="contenido" className="flex-1">
-          {children}
-        </main>
-        <PieDePagina />
-        <CajonCarrito />
-        <BotonWhatsappFlotante />
+        {children}
         <RegistroServiceWorker />
       </body>
     </html>

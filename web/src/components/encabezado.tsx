@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { ShoppingBag, Menu, X, User } from 'lucide-react'
 import { Marca } from '@/components/marca'
 import { usarCarrito, unidadesDe } from '@/lib/carrito'
@@ -25,12 +25,6 @@ export function Encabezado() {
   const { data: sesion } = useSession()
 
   const unidades = unidadesDe(items)
-
-  useEffect(() => {
-    setMenuAbierto(false)
-  }, [ruta])
-
-  if (ruta?.startsWith('/admin')) return null
 
   return (
     <>
@@ -125,6 +119,7 @@ export function Encabezado() {
                 <li key={enlace.href}>
                   <Link
                     href={enlace.href}
+                    onClick={() => setMenuAbierto(false)}
                     className="block border-b border-linea py-3 text-[0.95rem] text-tinta last:border-b-0"
                   >
                     {enlace.texto}

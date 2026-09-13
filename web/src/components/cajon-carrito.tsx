@@ -33,8 +33,6 @@ export function CajonCarrito() {
     cerrar()
   }, [ruta, cerrar])
 
-  if (ruta?.startsWith('/admin')) return null
-
   return (
     <dialog
       ref={dialogo}
