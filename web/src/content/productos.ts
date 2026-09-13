@@ -1,0 +1,388 @@
+import type { Producto } from '@/lib/tipos'
+
+const PRECIO_GRANDE = 7500
+const PRECIO_PEQUENO = 5000
+
+const MOLDE_GRANDE = 'Corazón, óvalo o flor, según disponibilidad'
+const MOLDE_PEQUENO = 'Redondo'
+
+/**
+ * Catálogo inicial. Es la fuente de verdad mientras no haya base de datos
+ * conectada; al conectar Neon, estos mismos datos se cargan como semilla y
+ * el panel pasa a administrarlos.
+ */
+export const PRODUCTOS_SEMILLA: Producto[] = [
+  {
+    id: 'menta-romero',
+    slug: 'menta-romero',
+    nombre: 'Menta y Romero',
+    claim: 'Despierta tu piel',
+    descripcion:
+      'Un jabón que se siente como abrir la ventana. La menta deja una frescura que despierta y el romero, usado por generaciones como purificante natural, ayuda a equilibrar la piel que tiende a la grasa. Es el favorito para la ducha de la mañana y para los pies cansados al final del día.',
+    modoDeUso:
+      'Humedece la piel, frota el jabón hasta obtener espuma, masajea con movimientos circulares y enjuaga. Ideal en la mañana.',
+    advertencia: null,
+    ingredientes: [
+      'Base de glicerina vegetal',
+      'Infusión de romero',
+      'Aceite esencial de menta',
+      'Ramas de romero deshidratado',
+    ],
+    beneficios: [
+      'Refresca y revitaliza',
+      'Ayuda a controlar la grasa',
+      'Purificante natural',
+      'Sensación descongestionante',
+      'Alivia la fatiga de los pies',
+      'Aroma herbal energizante',
+    ],
+    tipoDePiel: ['Mixta', 'Grasa'],
+    uso: ['Corporal'],
+    aroma: 'Herbal fresco, mentolado',
+    colorMarca: '#4F6B4D',
+    imagenes: [
+      {
+        url: '/productos/menta-romero-1.jpg',
+        alt: 'Jabón artesanal de menta y romero en forma de corazón, color verde jade translúcido con una ramita de romero incrustada',
+      },
+      {
+        url: '/productos/menta-romero-2.jpg',
+        alt: 'Jabón de menta y romero sobre una jabonera de cerámica blanca junto a ramas de romero fresco',
+      },
+    ],
+    destacado: true,
+    activo: true,
+    orden: 1,
+    variantes: [
+      {
+        id: 'menta-romero-grande',
+        productoId: 'menta-romero',
+        tamano: 'grande',
+        precio: PRECIO_GRANDE,
+        pesoGramos: null,
+        molde: MOLDE_GRANDE,
+        sku: 'MENTA-G',
+        disponible: true,
+      },
+      {
+        id: 'menta-romero-pequeno',
+        productoId: 'menta-romero',
+        tamano: 'pequeno',
+        precio: PRECIO_PEQUENO,
+        pesoGramos: null,
+        molde: MOLDE_PEQUENO,
+        sku: 'MENTA-P',
+        disponible: true,
+      },
+    ],
+  },
+  {
+    id: 'arroz',
+    slug: 'arroz',
+    nombre: 'Arroz',
+    claim: 'Luz pareja',
+    descripcion:
+      'El secreto de belleza más antiguo de Asia, en pastilla. El agua de arroz es rica en inositol y almidón, que aportan luminosidad y ayudan a que el tono se vea más parejo. Tiene un aroma casi neutro: perfecto si te molestan los jabones perfumados.',
+    modoDeUso:
+      'Aplica sobre el rostro húmedo con movimientos suaves, deja actuar 30 segundos y enjuaga con agua tibia. Puedes usarlo mañana y noche.',
+    advertencia: null,
+    ingredientes: ['Base de glicerina vegetal', 'Agua de arroz', 'Harina de arroz fina'],
+    beneficios: [
+      'Ayuda a unificar el tono',
+      'Aporta luminosidad',
+      'Suaviza la textura de la piel',
+      'Antioxidante natural',
+      'Ayuda a minimizar la apariencia de los poros',
+      'Limpieza suave, no reseca',
+    ],
+    tipoDePiel: ['Todo tipo'],
+    uso: ['Facial', 'Corporal'],
+    aroma: 'Neutro, muy suave',
+    colorMarca: '#856A44',
+    imagenes: [
+      {
+        url: '/productos/arroz-1.jpg',
+        alt: 'Jabón artesanal de arroz, pastilla redonda color blanco perla translúcido junto a granos de arroz',
+      },
+      {
+        url: '/productos/arroz-2.jpg',
+        alt: 'Jabón de arroz sobre jabonera de cerámica blanca en un baño de luz natural',
+      },
+    ],
+    destacado: true,
+    activo: true,
+    orden: 2,
+    variantes: [
+      {
+        id: 'arroz-grande',
+        productoId: 'arroz',
+        tamano: 'grande',
+        precio: PRECIO_GRANDE,
+        pesoGramos: null,
+        molde: MOLDE_GRANDE,
+        sku: 'ARROZ-G',
+        disponible: true,
+      },
+      {
+        id: 'arroz-pequeno',
+        productoId: 'arroz',
+        tamano: 'pequeno',
+        precio: PRECIO_PEQUENO,
+        pesoGramos: null,
+        molde: MOLDE_PEQUENO,
+        sku: 'ARROZ-P',
+        disponible: true,
+      },
+    ],
+  },
+  {
+    id: 'avena',
+    slug: 'avena',
+    nombre: 'Avena',
+    claim: 'Calma y abraza',
+    descripcion:
+      'Si tu piel se pone roja con cualquier cosa, este es tu jabón. La avena es uno de los calmantes naturales más nobles que existen: exfolia con delicadeza mientras deja una película que ayuda a retener la humedad. Suave hasta para la piel de los niños.',
+    modoDeUso:
+      'Frota suavemente sobre la piel húmeda, insistiendo en codos y rodillas. Enjuaga sin restregar.',
+    advertencia: null,
+    ingredientes: ['Base de glicerina vegetal', 'Avena molida', 'Hojuelas de avena'],
+    beneficios: [
+      'Exfoliación suave',
+      'Calma la piel irritada',
+      'Ayuda a aliviar la resequedad',
+      'Hidratación natural',
+      'Apto para piel sensible',
+      'Limpia sin arrastrar los aceites naturales',
+    ],
+    tipoDePiel: ['Seca', 'Sensible'],
+    uso: ['Facial', 'Corporal'],
+    aroma: 'Cereal dulce, muy tenue',
+    colorMarca: '#8A6836',
+    imagenes: [
+      {
+        url: '/productos/avena-1.jpg',
+        alt: 'Jabón artesanal de avena, pastilla color crema con hojuelas de avena visibles en la superficie',
+      },
+      {
+        url: '/productos/avena-2.jpg',
+        alt: 'Jabón de avena sobre mármol junto a una cuchara de madera con hojuelas de avena',
+      },
+    ],
+    destacado: true,
+    activo: true,
+    orden: 3,
+    variantes: [
+      {
+        id: 'avena-grande',
+        productoId: 'avena',
+        tamano: 'grande',
+        precio: PRECIO_GRANDE,
+        pesoGramos: null,
+        molde: MOLDE_GRANDE,
+        sku: 'AVENA-G',
+        disponible: true,
+      },
+      {
+        id: 'avena-pequeno',
+        productoId: 'avena',
+        tamano: 'pequeno',
+        precio: PRECIO_PEQUENO,
+        pesoGramos: null,
+        molde: MOLDE_PEQUENO,
+        sku: 'AVENA-P',
+        disponible: true,
+      },
+    ],
+  },
+  {
+    id: 'arroz-avena',
+    slug: 'arroz-avena',
+    nombre: 'Arroz y Avena',
+    claim: 'Exfolia e ilumina',
+    descripcion:
+      'Lo mejor de nuestros dos jabones más queridos en una sola pastilla. La avena exfolia y calma; el arroz ilumina y empareja el tono. Es el jabón que recomendamos cuando alguien no sabe por cuál empezar.',
+    modoDeUso:
+      'Úsalo dos o tres veces por semana como exfoliante suave y el resto de días como limpiador diario.',
+    advertencia: null,
+    ingredientes: [
+      'Base de glicerina vegetal',
+      'Agua y harina de arroz',
+      'Avena molida',
+    ],
+    beneficios: [
+      'Exfoliación delicada',
+      'Ayuda a unificar el tono',
+      'Suaviza y calma a la vez',
+      'Aporta luminosidad',
+      'Ideal para piel sensible',
+      'Deja la piel tersa sin resecar',
+    ],
+    tipoDePiel: ['Todo tipo', 'Sensible'],
+    uso: ['Facial', 'Corporal'],
+    aroma: 'Cereal suave',
+    colorMarca: '#86653F',
+    imagenes: [
+      {
+        url: '/productos/arroz-avena-1.jpg',
+        alt: 'Jabón artesanal de arroz y avena, pastilla ovalada color marfil con partículas de avena suspendidas',
+      },
+      {
+        url: '/productos/arroz-avena-2.jpg',
+        alt: 'Jabón de arroz y avena sobre jabonera blanca junto a granos de arroz y hojuelas de avena',
+      },
+    ],
+    destacado: false,
+    activo: true,
+    orden: 4,
+    variantes: [
+      {
+        id: 'arroz-avena-grande',
+        productoId: 'arroz-avena',
+        tamano: 'grande',
+        precio: PRECIO_GRANDE,
+        pesoGramos: null,
+        molde: MOLDE_GRANDE,
+        sku: 'ARRAV-G',
+        disponible: true,
+      },
+      {
+        id: 'arroz-avena-pequeno',
+        productoId: 'arroz-avena',
+        tamano: 'pequeno',
+        precio: PRECIO_PEQUENO,
+        pesoGramos: null,
+        molde: MOLDE_PEQUENO,
+        sku: 'ARRAV-P',
+        disponible: true,
+      },
+    ],
+  },
+  {
+    id: 'curcuma-miel',
+    slug: 'curcuma-miel',
+    nombre: 'Cúrcuma y Miel',
+    claim: 'Equilibrio y brillo',
+    descripcion:
+      'La cúrcuma es antioxidante y la miel es humectante natural: juntas dejan el rostro limpio sin esa sensación de tirantez. Es nuestro jabón para la piel que se brilla a media mañana y necesita equilibrio, no agresión.',
+    modoDeUso:
+      'Aplica sobre el rostro húmedo, deja actuar un minuto y enjuaga. Preferiblemente por la noche.',
+    advertencia:
+      'Contiene cúrcuma. Haz una prueba en una zona pequeña si tu piel es muy clara o muy reactiva.',
+    ingredientes: [
+      'Base de glicerina vegetal',
+      'Cúrcuma en polvo',
+      'Miel de abejas',
+    ],
+    beneficios: [
+      'Ayuda a calmar las imperfecciones',
+      'Antioxidante natural',
+      'Aporta luminosidad al rostro',
+      'La miel humecta de forma natural',
+      'Ayuda a que la piel se vea más uniforme',
+      'Sensación de piel suave y tersa',
+    ],
+    tipoDePiel: ['Mixta', 'Grasa'],
+    uso: ['Facial'],
+    aroma: 'Cálido, especiado y dulce',
+    colorMarca: '#8A6410',
+    imagenes: [
+      {
+        url: '/productos/curcuma-miel-1.jpg',
+        alt: 'Jabón artesanal de cúrcuma y miel, pastilla ovalada color terracota rosado con motas de cúrcuma',
+      },
+      {
+        url: '/productos/curcuma-miel-2.jpg',
+        alt: 'Jabón de cúrcuma y miel junto a un cucharón con miel dorada goteando',
+      },
+    ],
+    destacado: true,
+    activo: true,
+    orden: 5,
+    variantes: [
+      {
+        id: 'curcuma-miel-grande',
+        productoId: 'curcuma-miel',
+        tamano: 'grande',
+        precio: PRECIO_GRANDE,
+        pesoGramos: null,
+        molde: MOLDE_GRANDE,
+        sku: 'CURMI-G',
+        disponible: true,
+      },
+      {
+        id: 'curcuma-miel-pequeno',
+        productoId: 'curcuma-miel',
+        tamano: 'pequeno',
+        precio: PRECIO_PEQUENO,
+        pesoGramos: null,
+        molde: MOLDE_PEQUENO,
+        sku: 'CURMI-P',
+        disponible: true,
+      },
+    ],
+  },
+  {
+    id: 'naranja-coco',
+    slug: 'naranja-coco',
+    nombre: 'Naranja y Aceite de Coco',
+    claim: 'Energía cítrica',
+    descripcion:
+      'Huele a mañana de domingo. La naranja aporta vitamina C y una frescura que despierta; el aceite de coco nutre en profundidad y deja la piel suave. Es el jabón que más nos piden para regalo, porque el aroma se siente desde que abres la bolsa.',
+    modoDeUso:
+      'Para cuerpo, úsalo a diario. Para rostro, preferiblemente en la noche.',
+    advertencia:
+      'Los cítricos pueden aumentar la sensibilidad al sol. Usa protector solar durante el día.',
+    ingredientes: [
+      'Base de glicerina vegetal',
+      'Ralladura y cáscara de naranja',
+      'Aceite de coco virgen',
+    ],
+    beneficios: [
+      'Vitamina C que ilumina',
+      'Hidratación profunda del coco',
+      'Antioxidante natural',
+      'Tonifica y revitaliza',
+      'Aroma cítrico que anima',
+      'Deja la piel nutrida, no grasosa',
+    ],
+    tipoDePiel: ['Seca', 'Todo tipo'],
+    uso: ['Facial', 'Corporal'],
+    aroma: 'Cítrico dulce con fondo de coco',
+    colorMarca: '#A9541B',
+    imagenes: [
+      {
+        url: '/productos/naranja-coco-1.jpg',
+        alt: 'Jabón artesanal de naranja y aceite de coco en forma de corazón, color ámbar con trocitos de cáscara de naranja',
+      },
+      {
+        url: '/productos/naranja-coco-2.jpg',
+        alt: 'Jabón de naranja y coco junto a media naranja fresca y coco partido',
+      },
+    ],
+    destacado: true,
+    activo: true,
+    orden: 6,
+    variantes: [
+      {
+        id: 'naranja-coco-grande',
+        productoId: 'naranja-coco',
+        tamano: 'grande',
+        precio: PRECIO_GRANDE,
+        pesoGramos: null,
+        molde: MOLDE_GRANDE,
+        sku: 'NARCO-G',
+        disponible: true,
+      },
+      {
+        id: 'naranja-coco-pequeno',
+        productoId: 'naranja-coco',
+        tamano: 'pequeno',
+        precio: PRECIO_PEQUENO,
+        pesoGramos: null,
+        molde: MOLDE_PEQUENO,
+        sku: 'NARCO-P',
+        disponible: true,
+      },
+    ],
+  },
+]
