@@ -16,6 +16,31 @@ import type { Producto, Tamano, Variante, Imagen } from '@/lib/tipos'
 type FilaProducto = typeof esquema.productos.$inferSelect
 type FilaVariante = typeof esquema.variantes.$inferSelect
 
+/**
+ * Durante la compilación la base puede no estar disponible: en CI no hay
+ * credenciales y en producción Neon puede estar despertando. Un despliegue
+ * no debe caerse por eso, así que en esa fase se devuelve el catálogo vacío
+ * y las páginas se generan después, bajo demanda.
+ *
+ * En ejecución normal el error sí se propaga: es preferible una página de
+ * error a una tienda que parece vacía sin motivo.
+ */
+const enCompilacion = process.env.NEXT_PHASE === 'phase-production-build'
+
+async function tolerarEnCompilacion<T>(consulta: () => Promise<T>, vacio: T): Promise<T> {
+  if (!enCompilacion) return consulta()
+
+  try {
+    return await consulta()
+  } catch (error) {
+    console.warn(
+      '[catalogo] la base no respondió durante la compilación; se sigue sin datos.',
+      error instanceof Error ? error.message : error,
+    )
+    return vacio
+  }
+}
+
 function aVariante(fila: FilaVariante): Variante {
   return {
     id: fila.id,
@@ -63,12 +88,14 @@ export async function obtenerTodosLosProductos(): Promise<Producto[]> {
     return [...PRODUCTOS_SEMILLA].sort((a, b) => a.orden - b.orden)
   }
 
-  const [filas, filasVariantes] = await Promise.all([
-    db.select().from(esquema.productos).orderBy(asc(esquema.productos.orden)),
-    db.select().from(esquema.variantes),
-  ])
+  return tolerarEnCompilacion(async () => {
+    const [filas, filasVariantes] = await Promise.all([
+      db!.select().from(esquema.productos).orderBy(asc(esquema.productos.orden)),
+      db!.select().from(esquema.variantes),
+    ])
 
-  return filas.map((fila) => aProducto(fila, filasVariantes))
+    return filas.map((fila) => aProducto(fila, filasVariantes))
+  }, [])
 }
 
 /** Lo que ve la clienta: solo productos activos. */
@@ -82,20 +109,22 @@ export async function obtenerProducto(slug: string): Promise<Producto | null> {
     return PRODUCTOS_SEMILLA.find((p) => p.slug === slug && p.activo) ?? null
   }
 
-  const [fila] = await db
-    .select()
-    .from(esquema.productos)
-    .where(eq(esquema.productos.slug, slug))
-    .limit(1)
+  return tolerarEnCompilacion(async () => {
+    const [fila] = await db!
+      .select()
+      .from(esquema.productos)
+      .where(eq(esquema.productos.slug, slug))
+      .limit(1)
 
-  if (!fila || !fila.activo) return null
+    if (!fila || !fila.activo) return null
 
-  const filasVariantes = await db
-    .select()
-    .from(esquema.variantes)
-    .where(eq(esquema.variantes.productoId, fila.id))
+    const filasVariantes = await db!
+      .select()
+      .from(esquema.variantes)
+      .where(eq(esquema.variantes.productoId, fila.id))
 
-  return aProducto(fila, filasVariantes)
+    return aProducto(fila, filasVariantes)
+  }, null)
 }
 
 /** Igual que la anterior pero sin filtrar por activo: el panel edita ocultos. */
