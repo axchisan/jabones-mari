@@ -1,7 +1,11 @@
 # Piezas publicitarias con IA
 
-Prompts para generar folletos, historias y publicaciones de Instagram con Gemini,
-**incluyendo el texto**, a partir de las fotos de producto que ya tenemos.
+Cómo se arman las piezas y por qué: la plantilla, las reglas que hacen que el texto salga bien
+y el calendario de publicación.
+
+> **¿Solo quieres copiar y pegar?** Los prompts ya ensamblados, uno por pieza, están en
+> **[`11-prompts-listos.md`](11-prompts-listos.md)**. Este documento explica el criterio detrás;
+> aquel es para trabajar.
 
 ---
 

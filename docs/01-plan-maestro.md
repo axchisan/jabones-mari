@@ -133,4 +133,5 @@ Estas cinco cosas necesito que las confirmen ustedes, no las puedo inventar:
 | `07-google-oauth.md` | Configurar el ingreso con Google, paso a paso. |
 | `08-despliegue.md` | Publicar en producción, CI/CD, dominio y variables. |
 | `09-search-console.md` | Search Console, indexación y medición. |
-| `10-publicidad.md` | Prompts para folletos, historias y carruseles. |
+| `10-publicidad.md` | Cómo se arman las piezas publicitarias y por qué. |
+| `11-prompts-listos.md` | Los 21 prompts ya ensamblados, para copiar y pegar. |
