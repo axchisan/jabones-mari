@@ -119,7 +119,30 @@ aparezcan como *Bloqueada por robots.txt* **es lo correcto**, no un problema.
 
 ---
 
-## 6. Lo que vale más que Search Console
+## 6. Medir las visitas
+
+Search Console cuenta lo que pasa **antes** del clic: qué busca la gente y cuántas veces
+apareces. Para saber qué hacen **dentro** de la tienda hace falta analítica.
+
+El sitio ya trae **Vercel Web Analytics**: sin cookies, sin datos personales y sin banner de
+consentimiento. Solo falta activarlo una vez, y eso pide confirmación en tu terminal:
+
+```bash
+cd web && npx vercel project web-analytics enable jabones-mari
+```
+
+Después, en el panel de Vercel → pestaña **Analytics**, vas a ver:
+
+- Qué páginas se visitan más y cuáles no ve nadie.
+- De dónde llega la gente (Instagram, WhatsApp, Google, directo).
+- Con qué dispositivo entran — casi todo será celular.
+
+Cruzarlo con Search Console es lo que da la foto completa: *"treinta personas buscaron jabón de
+avena, doce entraron, y de esas, cuatro abrieron el carrito"*.
+
+---
+
+## 7. Lo que vale más que Search Console
 
 Para un negocio local, **Google Business Profile pesa más que el sitio web**. Es lo que hace que
 aparezcas en el mapa y en el recuadro lateral cuando alguien busca "jabones artesanales Bogotá".
@@ -136,7 +159,7 @@ estrellas mueven más la aguja que meses de optimización técnica.
 
 ---
 
-## 7. Calendario realista
+## 8. Calendario realista
 
 | Cuándo | Qué |
 |---|---|
@@ -153,7 +176,7 @@ reseñas en Google Business.
 
 ---
 
-## 8. Si algo sale mal
+## 9. Si algo sale mal
 
 | Lo que ves | Qué significa |
 |---|---|
