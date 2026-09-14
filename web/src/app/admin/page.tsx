@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { ClipboardList, Package, AlertTriangle, ArrowRight } from 'lucide-react'
 import { EtiquetaEstado } from '@/components/tarjeta-pedido'
 import { AvisosDePedidos } from '@/components/admin/avisos-pedidos'
+import { hayCorreo } from '@/lib/notificaciones/correo'
 import { obtenerTodosLosProductos } from '@/lib/catalogo'
 import { listarPedidos } from '@/lib/pedidos'
 import { precio, fechaLegible } from '@/lib/formato'
@@ -34,7 +35,7 @@ export default async function TableroAdmin() {
         </p>
       </header>
 
-      <AvisosDePedidos />
+      <AvisosDePedidos correoActivo={hayCorreo} />
 
       <section aria-label="Indicadores" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Indicador

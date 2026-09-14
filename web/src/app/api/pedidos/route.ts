@@ -4,6 +4,7 @@ import { nuevoPedidoSchema } from '@/lib/validacion'
 import { construirMensaje } from '@/lib/whatsapp'
 import { obtenerSesion } from '@/lib/auth/sesion'
 import { avisarAdministracion } from '@/lib/notificaciones/push'
+import { avisarPedidoPorCorreo } from '@/lib/notificaciones/correo'
 import { precio } from '@/lib/formato'
 
 export async function POST(peticion: Request) {
@@ -56,13 +57,20 @@ export async function POST(peticion: Request) {
     // ya está guardado y se ve igual en el panel.
     const unidades = pedido.items.reduce((suma, i) => suma + i.cantidad, 0)
 
-    avisarAdministracion({
-      titulo: `Pedido nuevo · ${precio(pedido.total)}`,
-      cuerpo: `${pedido.clienteNombre} pidió ${unidades} ${unidades === 1 ? 'jabón' : 'jabones'}. Código ${pedido.codigo}.`,
-      url: `/admin/pedidos/${pedido.id}`,
-      etiqueta: `pedido-${pedido.codigo}`,
-    }).catch((error) => {
-      console.error('[pedidos] no se pudo avisar por notificación', error)
+    Promise.allSettled([
+      avisarAdministracion({
+        titulo: `Pedido nuevo · ${precio(pedido.total)}`,
+        cuerpo: `${pedido.clienteNombre} pidió ${unidades} ${unidades === 1 ? 'jabón' : 'jabones'}. Código ${pedido.codigo}.`,
+        url: `/admin/pedidos/${pedido.id}`,
+        etiqueta: `pedido-${pedido.codigo}`,
+      }),
+      avisarPedidoPorCorreo(pedido),
+    ]).then((resultados) => {
+      for (const resultado of resultados) {
+        if (resultado.status === 'rejected') {
+          console.error('[pedidos] falló un aviso', resultado.reason)
+        }
+      }
     })
 
     return NextResponse.json({ codigo: pedido.codigo, id: pedido.id, mensaje })

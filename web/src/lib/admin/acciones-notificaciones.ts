@@ -9,6 +9,7 @@ import {
   avisarAdministracion,
   type DatosSuscripcion,
 } from '@/lib/notificaciones/push'
+import { probarCorreo, hayCorreo } from '@/lib/notificaciones/correo'
 import type { ResultadoAccion } from '@/lib/admin/acciones-productos'
 
 /** Nombre legible del dispositivo, para distinguir el celular del portátil. */
@@ -82,4 +83,18 @@ export async function probarNotificacion(): Promise<ResultadoAccion> {
     ok: true,
     mensaje: `Aviso enviado a ${enviados} dispositivo${enviados === 1 ? '' : 's'}`,
   }
+}
+
+/** Estado de los dos canales de aviso, para pintarlo en el panel. */
+export async function estadoDeAvisos(): Promise<{ correo: boolean }> {
+  await requerirAdmin()
+  return { correo: hayCorreo }
+}
+
+/** Manda un correo de prueba al destinatario configurado. */
+export async function probarAvisoPorCorreo(): Promise<ResultadoAccion> {
+  await requerirAdmin()
+
+  const { ok, detalle } = await probarCorreo()
+  return ok ? { ok: true, mensaje: detalle } : { ok: false, error: detalle }
 }

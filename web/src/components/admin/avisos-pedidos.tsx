@@ -1,11 +1,12 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Bell, BellOff, Loader2, Check, AlertCircle, Send } from 'lucide-react'
+import { Bell, BellOff, Loader2, Check, AlertCircle, Send, Mail } from 'lucide-react'
 import {
   activarNotificaciones,
   desactivarNotificaciones,
   probarNotificacion,
+  probarAvisoPorCorreo,
 } from '@/lib/admin/acciones-notificaciones'
 import type { ResultadoAccion } from '@/lib/admin/acciones-productos'
 import { cn } from '@/lib/utilidades'
@@ -20,7 +21,7 @@ function aBytes(base64url: string): Uint8Array {
   return Uint8Array.from([...crudo].map((c) => c.charCodeAt(0)))
 }
 
-export function AvisosDePedidos() {
+export function AvisosDePedidos({ correoActivo }: { correoActivo: boolean }) {
   const [estado, setEstado] = useState<Estado>('cargando')
   const [trabajando, setTrabajando] = useState(false)
   const [aviso, setAviso] = useState<ResultadoAccion | null>(null)
@@ -120,6 +121,12 @@ export function AvisosDePedidos() {
   async function probar() {
     setTrabajando(true)
     setAviso(await probarNotificacion())
+    setTrabajando(false)
+  }
+
+  async function probarCorreoAhora() {
+    setTrabajando(true)
+    setAviso(await probarAvisoPorCorreo())
     setTrabajando(false)
   }
 
@@ -225,6 +232,28 @@ export function AvisosDePedidos() {
           instala antes el panel como aplicación desde el menú del navegador.
         </p>
       )}
+
+      {/* Respaldo por correo: llega aunque el celular esté apagado. */}
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-linea pt-4">
+        <p className="flex items-center gap-2 text-sm text-tinta-media">
+          <Mail className="size-4 shrink-0 text-tinta-tenue" aria-hidden="true" />
+          {correoActivo
+            ? 'También te llega un correo con cada pedido.'
+            : 'El aviso por correo no está configurado. Ver docs/13-avisos.md'}
+        </p>
+
+        {correoActivo && (
+          <button
+            type="button"
+            disabled={trabajando}
+            onClick={probarCorreoAhora}
+            className="inline-flex items-center gap-1.5 rounded-full border border-linea-fuerte bg-white px-4 py-2 text-sm transition hover:border-rosa hover:text-rosa-hondo disabled:opacity-60"
+          >
+            <Send className="size-3.5" aria-hidden="true" />
+            Probar correo
+          </button>
+        )}
+      </div>
     </section>
   )
 }
