@@ -9,7 +9,7 @@
  * Al cambiar VERSION se descartan los cachés anteriores.
  */
 
-const VERSION = 'v1'
+const VERSION = 'v2'
 const CACHE_PAGINAS = `paginas-${VERSION}`
 const CACHE_ESTATICOS = `estaticos-${VERSION}`
 const PAGINA_SIN_CONEXION = '/sin-conexion'
@@ -91,4 +91,59 @@ self.addEventListener('fetch', (evento) => {
         }),
     )
   }
+})
+
+/* ------------------------------------------------------------ avisos push */
+
+/**
+ * Aviso de pedido nuevo. Llega aunque el panel esté cerrado, siempre que
+ * esté instalado como aplicación y se hayan aceptado las notificaciones.
+ */
+self.addEventListener('push', (evento) => {
+  if (!evento.data) return
+
+  let datos
+  try {
+    datos = evento.data.json()
+  } catch {
+    datos = { titulo: 'Jabones Mari', cuerpo: evento.data.text() }
+  }
+
+  evento.waitUntil(
+    self.registration.showNotification(datos.titulo ?? 'Jabones Mari', {
+      body: datos.cuerpo ?? '',
+      icon: '/icons/icon-192.png',
+      badge: '/icons/icon-192.png',
+      // Misma etiqueta agrupa los avisos en vez de apilar decenas.
+      tag: datos.etiqueta ?? 'pedido',
+      renotify: true,
+      requireInteraction: false,
+      data: { url: datos.url ?? '/admin/pedidos' },
+    }),
+  )
+})
+
+self.addEventListener('notificationclick', (evento) => {
+  evento.notification.close()
+  const destino = evento.notification.data?.url ?? '/admin/pedidos'
+
+  evento.waitUntil(
+    (async () => {
+      const ventanas = await self.clients.matchAll({
+        type: 'window',
+        includeUncontrolled: true,
+      })
+
+      // Si el panel ya está abierto, se reutiliza esa ventana.
+      for (const ventana of ventanas) {
+        if (ventana.url.includes('/admin') && 'focus' in ventana) {
+          await ventana.focus()
+          if ('navigate' in ventana) await ventana.navigate(destino)
+          return
+        }
+      }
+
+      await self.clients.openWindow(destino)
+    })(),
+  )
 })

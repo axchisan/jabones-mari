@@ -71,3 +71,24 @@ export const verificaciones = pgTable('verification', {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 })
+
+/**
+ * Suscripciones a notificaciones push del panel.
+ *
+ * Cada navegador donde una administradora active las notificaciones deja
+ * aquí su endpoint. Una misma persona puede tener varios: el celular, el
+ * portátil, la tableta.
+ */
+export const suscripcionesPush = pgTable('suscripciones_push', {
+  id: text('id').primaryKey(),
+  usuarioId: text('usuario_id')
+    .notNull()
+    .references(() => usuarios.id, { onDelete: 'cascade' }),
+  // El endpoint identifica al navegador: es único por dispositivo.
+  endpoint: text('endpoint').notNull().unique(),
+  p256dh: text('p256dh').notNull(),
+  auth: text('auth').notNull(),
+  dispositivo: text('dispositivo'),
+  creadaEn: timestamp('creada_en', { withTimezone: true }).notNull().defaultNow(),
+  usadaEn: timestamp('usada_en', { withTimezone: true }),
+})
