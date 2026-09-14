@@ -3,6 +3,8 @@ import { crearPedido } from '@/lib/pedidos'
 import { nuevoPedidoSchema } from '@/lib/validacion'
 import { construirMensaje } from '@/lib/whatsapp'
 import { obtenerSesion } from '@/lib/auth/sesion'
+import { avisarAdministracion } from '@/lib/notificaciones/push'
+import { precio } from '@/lib/formato'
 
 export async function POST(peticion: Request) {
   let cuerpo: unknown
@@ -48,6 +50,19 @@ export async function POST(peticion: Request) {
       notas: pedido.notas,
       items: pedido.items,
       subtotal: pedido.subtotal,
+    })
+
+    // El aviso no debe retrasar ni tumbar la respuesta: si falla, el pedido
+    // ya está guardado y se ve igual en el panel.
+    const unidades = pedido.items.reduce((suma, i) => suma + i.cantidad, 0)
+
+    avisarAdministracion({
+      titulo: `Pedido nuevo · ${precio(pedido.total)}`,
+      cuerpo: `${pedido.clienteNombre} pidió ${unidades} ${unidades === 1 ? 'jabón' : 'jabones'}. Código ${pedido.codigo}.`,
+      url: `/admin/pedidos/${pedido.id}`,
+      etiqueta: `pedido-${pedido.codigo}`,
+    }).catch((error) => {
+      console.error('[pedidos] no se pudo avisar por notificación', error)
     })
 
     return NextResponse.json({ codigo: pedido.codigo, id: pedido.id, mensaje })

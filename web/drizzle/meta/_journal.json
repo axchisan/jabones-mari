@@ -15,6 +15,13 @@
       "when": 1789309471511,
       "tag": "0001_real_energizer",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1789400132344,
+      "tag": "0002_wakeful_betty_brant",
+      "breakpoints": true
     }
   ]
 }
