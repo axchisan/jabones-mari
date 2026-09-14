@@ -6,11 +6,10 @@ export function Marca({ compacta = false }: { compacta?: boolean }) {
   return (
     <Link href="/" className="flex items-center gap-2.5" aria-label={`${NEGOCIO.nombre}, inicio`}>
       <Image
-        src="/logo-mari.jpg"
+        src="/logo-mari.png"
         alt=""
         width={44}
         height={44}
-        className="rounded-full"
         priority
       />
       {!compacta && (
