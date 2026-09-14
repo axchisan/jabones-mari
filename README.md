@@ -10,11 +10,14 @@ Catálogo administrable, carrito y pedidos que se cierran por WhatsApp.
 ## Qué hay aquí
 
 ```
-docs/       Planteamiento del proyecto, identidad, catálogo, prompts de IA, SEO y despliegue
+docs/       Planteamiento, identidad, catálogo, prompts de IA, SEO, despliegue y publicidad
 brand/      Logos de la marca
 material/   Fotos originales y referencias (no se publican)
 web/        La aplicación
 ```
+
+Las piezas publicitarias generadas viven en `Imagenes Publicidad/`, fuera del control de
+versiones: pesan 32 MB y se regeneran con los prompts de `docs/11-prompts-listos.md`.
 
 ## Cómo levantarlo
 

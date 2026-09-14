@@ -19,7 +19,7 @@ export default async function LayoutAdmin({ children }: { children: React.ReactN
       <header className="sticky top-0 z-20 border-b border-linea bg-crema/90 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3">
           <div className="flex items-center gap-2.5">
-            <Image src="/logo-mari.jpg" alt="" width={36} height={36} className="rounded-full" />
+            <Image src="/logo-mari.png" alt="" width={36} height={36} />
             <div className="leading-none">
               <span className="block font-[family-name:var(--font-display)] text-lg">
                 Panel de {NEGOCIO.nombreCorto}
