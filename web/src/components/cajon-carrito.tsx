@@ -4,9 +4,10 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
-import { Minus, Plus, Trash2, X, ShoppingBag, Info } from 'lucide-react'
+import { Minus, Plus, Trash2, X, ShoppingBag } from 'lucide-react'
 import { usarCarrito, subtotalDe, unidadesDe, limiteDe } from '@/lib/carrito'
 import { useSincronizarStock } from '@/lib/sincronizar-carrito'
+import { AvisoExistencias } from '@/components/aviso-existencias'
 import { precio } from '@/lib/formato'
 import { ETIQUETA_TAMANO } from '@/lib/tipos'
 import { DOMICILIO } from '@/lib/config'
@@ -20,6 +21,7 @@ export function CajonCarrito() {
   const cambiarCantidad = usarCarrito((e) => e.cambiarCantidad)
   const quitar = usarCarrito((e) => e.quitar)
   const ajustes = usarCarrito((e) => e.ajustes)
+  const olvidarAjustes = usarCarrito((e) => e.olvidarAjustes)
 
   // Al abrir el carrito se comprueba el inventario: puede llevar días guardado.
   useSincronizarStock(abierto)
@@ -69,13 +71,17 @@ export function CajonCarrito() {
           </button>
         </header>
 
+        <AvisoExistencias avisos={ajustes} alCerrar={olvidarAjustes} className="mx-5 mt-4" />
+
         {items.length === 0 ? (
           <div className="flex flex-1 flex-col items-center justify-center gap-4 px-8 text-center">
             <span className="grid size-16 place-items-center rounded-full bg-rosa-suave text-rosa-hondo">
               <ShoppingBag className="size-7" aria-hidden="true" />
             </span>
             <p className="text-tinta-media">
-              Todavía no has agregado ningún jabón.
+              {ajustes.length > 0
+                ? 'Tu carrito quedó vacío. Escríbenos por WhatsApp si quieres que te avisemos de la próxima tanda.'
+                : 'Todavía no has agregado ningún jabón.'}
             </p>
             <Link
               href="/catalogo"
@@ -87,20 +93,6 @@ export function CajonCarrito() {
           </div>
         ) : (
           <>
-            {ajustes.length > 0 && (
-              <div
-                role="status"
-                className="mx-5 mt-4 flex gap-2.5 rounded-suave bg-rosa-suave px-4 py-3 text-sm text-rosa-hondo"
-              >
-                <Info className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-                <ul className="flex flex-col gap-1">
-                  {ajustes.map((aviso) => (
-                    <li key={aviso}>{aviso}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
             <ul className="flex-1 divide-y divide-linea overflow-y-auto px-5">
               {items.map((item) => (
                 <li key={item.varianteId} className="flex gap-3.5 py-4">

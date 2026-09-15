@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { crearPedido } from '@/lib/pedidos'
 import { armarItemsDesdeCatalogo } from '@/lib/catalogo'
 import { revisarDisponibilidad, mensajeDeFaltas } from '@/lib/inventario'
@@ -74,6 +75,13 @@ export async function POST(peticion: Request) {
       notas: datos.notas || null,
       items,
     })
+
+    // Lo que acaba de apartarse ya no está disponible para la siguiente
+    // clienta: el catálogo publicado deja de ser cierto en ese momento.
+    revalidatePath('/catalogo')
+    for (const slug of new Set(pedido.items.map((i) => i.productoSlug))) {
+      revalidatePath(`/producto/${slug}`)
+    }
 
     const mensaje = construirMensaje({
       codigo: pedido.codigo,
