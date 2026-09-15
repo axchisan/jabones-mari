@@ -2,7 +2,8 @@ import 'server-only'
 import { asc, eq } from 'drizzle-orm'
 import { db, hayBaseDeDatos, esquema } from '@/lib/db/cliente'
 import { PRODUCTOS_SEMILLA } from '@/content/productos'
-import type { Producto, Tamano, Variante, Imagen } from '@/lib/tipos'
+import { comprometidoPorVariante } from '@/lib/inventario'
+import type { Producto, Tamano, Variante, Imagen, ItemPedido } from '@/lib/tipos'
 
 /**
  * Acceso al catálogo.
@@ -41,7 +42,15 @@ async function tolerarEnCompilacion<T>(consulta: () => Promise<T>, vacio: T): Pr
   }
 }
 
-function aVariante(fila: FilaVariante): Variante {
+/**
+ * Lo que se puede vender de una presentación no es su stock, sino el stock
+ * menos lo apartado en pedidos que aún no se entregan. Sin ese descuento el
+ * catálogo muestra existencias que ya tienen dueño.
+ */
+function aVariante(fila: FilaVariante, comprometido: Map<string, number>): Variante {
+  const apartado = comprometido.get(fila.id) ?? 0
+  const disponibles = fila.stock === null ? null : Math.max(fila.stock - apartado, 0)
+
   return {
     id: fila.id,
     productoId: fila.productoId,
@@ -51,12 +60,17 @@ function aVariante(fila: FilaVariante): Variante {
     molde: fila.molde ?? '',
     sku: fila.sku,
     stock: fila.stock,
-    disponible: fila.disponible && (fila.stock === null || fila.stock > 0),
+    disponibles,
+    disponible: fila.disponible && (disponibles === null || disponibles > 0),
     orden: fila.orden,
   }
 }
 
-function aProducto(fila: FilaProducto, variantes: FilaVariante[]): Producto {
+function aProducto(
+  fila: FilaProducto,
+  variantes: FilaVariante[],
+  comprometido: Map<string, number>,
+): Producto {
   return {
     id: fila.id,
     slug: fila.slug,
@@ -79,7 +93,7 @@ function aProducto(fila: FilaProducto, variantes: FilaVariante[]): Producto {
     variantes: variantes
       .filter((v) => v.productoId === fila.id)
       .sort((a, b) => a.orden - b.orden)
-      .map(aVariante),
+      .map((v) => aVariante(v, comprometido)),
   }
 }
 
@@ -90,12 +104,13 @@ export async function obtenerTodosLosProductos(): Promise<Producto[]> {
   }
 
   return tolerarEnCompilacion(async () => {
-    const [filas, filasVariantes] = await Promise.all([
+    const [filas, filasVariantes, comprometido] = await Promise.all([
       db!.select().from(esquema.productos).orderBy(asc(esquema.productos.orden)),
       db!.select().from(esquema.variantes),
+      comprometidoPorVariante(),
     ])
 
-    return filas.map((fila) => aProducto(fila, filasVariantes))
+    return filas.map((fila) => aProducto(fila, filasVariantes, comprometido))
   }, [])
 }
 
@@ -119,12 +134,12 @@ export async function obtenerProducto(slug: string): Promise<Producto | null> {
 
     if (!fila || !fila.activo) return null
 
-    const filasVariantes = await db!
-      .select()
-      .from(esquema.variantes)
-      .where(eq(esquema.variantes.productoId, fila.id))
+    const [filasVariantes, comprometido] = await Promise.all([
+      db!.select().from(esquema.variantes).where(eq(esquema.variantes.productoId, fila.id)),
+      comprometidoPorVariante(),
+    ])
 
-    return aProducto(fila, filasVariantes)
+    return aProducto(fila, filasVariantes, comprometido)
   }, null)
 }
 
@@ -142,12 +157,12 @@ export async function obtenerProductoPorId(id: string): Promise<Producto | null>
 
   if (!fila) return null
 
-  const filasVariantes = await db
-    .select()
-    .from(esquema.variantes)
-    .where(eq(esquema.variantes.productoId, fila.id))
+  const [filasVariantes, comprometido] = await Promise.all([
+    db.select().from(esquema.variantes).where(eq(esquema.variantes.productoId, fila.id)),
+    comprometidoPorVariante(),
+  ])
 
-  return aProducto(fila, filasVariantes)
+  return aProducto(fila, filasVariantes, comprometido)
 }
 
 export async function obtenerDestacados(limite?: number): Promise<Producto[]> {
@@ -172,7 +187,9 @@ export async function obtenerVariante(varianteId: string): Promise<Variante | nu
     .where(eq(esquema.variantes.id, varianteId))
     .limit(1)
 
-  return fila ? aVariante(fila) : null
+  if (!fila) return null
+
+  return aVariante(fila, await comprometidoPorVariante())
 }
 
 /** Precio más bajo disponible, para el "desde $X". */
@@ -211,4 +228,59 @@ export function rangoDePrecios(productos: Producto[]): { min: number; max: numbe
   const precios = productos.flatMap((p) => p.variantes.map((v) => v.precio))
   if (precios.length === 0) return null
   return { min: Math.min(...precios), max: Math.max(...precios) }
+}
+
+/**
+ * Rehace las líneas de un pedido leyendo el catálogo.
+ *
+ * El navegador manda qué presentación y cuántas; el precio, el nombre y el
+ * tamaño salen de aquí. Así un carrito manipulado no puede fijar su propio
+ * precio, y un pedido guardado nunca contradice al catálogo.
+ *
+ * Devuelve también las líneas que no se pudieron resolver: presentaciones
+ * borradas, ocultas o de un producto que ya no está activo.
+ */
+export async function armarItemsDesdeCatalogo(
+  lineas: { varianteId: string; cantidad: number }[],
+  opciones: { permitirOcultas?: boolean } = {},
+): Promise<{ items: ItemPedido[]; descartadas: string[] }> {
+  const productos = await obtenerTodosLosProductos()
+
+  const indice = new Map<string, { producto: Producto; variante: Variante }>()
+  for (const producto of productos) {
+    for (const variante of producto.variantes) {
+      indice.set(variante.id, { producto, variante })
+    }
+  }
+
+  const items: ItemPedido[] = []
+  const descartadas: string[] = []
+
+  for (const linea of lineas) {
+    const encontrado = indice.get(linea.varianteId)
+
+    if (!encontrado) {
+      descartadas.push(linea.varianteId)
+      continue
+    }
+
+    const { producto, variante } = encontrado
+    const vendible = opciones.permitirOcultas || (producto.activo && variante.disponible)
+
+    if (!vendible) {
+      descartadas.push(linea.varianteId)
+      continue
+    }
+
+    items.push({
+      varianteId: variante.id,
+      productoSlug: producto.slug,
+      nombre: producto.nombre,
+      tamano: variante.tamano,
+      precio: variante.precio,
+      cantidad: linea.cantidad,
+    })
+  }
+
+  return { items, descartadas }
 }

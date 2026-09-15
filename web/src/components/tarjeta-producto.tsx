@@ -68,6 +68,11 @@ export function TarjetaProducto({
               key={variante.id}
               type="button"
               disabled={!variante.disponible}
+              title={
+                variante.disponibles !== null && variante.disponibles <= 5
+                  ? `Quedan ${variante.disponibles}`
+                  : undefined
+              }
               onClick={() => agregar(producto, variante)}
               className="flex items-center justify-between gap-2 rounded-full border border-linea-fuerte bg-crema px-4 py-2.5 text-sm transition enabled:hover:border-rosa enabled:hover:bg-rosa-niebla enabled:hover:text-rosa-hondo disabled:cursor-not-allowed disabled:opacity-45"
             >

@@ -9,6 +9,12 @@ import {
   obtenerPedido,
 } from '@/lib/pedidos'
 import { obtenerVariante, obtenerProductoPorId, obtenerTodosLosProductos } from '@/lib/catalogo'
+import {
+  descontarPorEntrega,
+  devolverAlInventario,
+  revisarDisponibilidad,
+  mensajeDeFaltas,
+} from '@/lib/inventario'
 import { ESTADOS_PEDIDO, type EstadoPedido, type ItemPedido } from '@/lib/tipos'
 import type { ResultadoAccion } from '@/lib/admin/acciones-productos'
 
@@ -36,10 +42,24 @@ export async function cambiarEstado(
     return { ok: false, error: 'Ese estado no existe' }
   }
 
+  const antes = await obtenerPedido(id)
+  if (!antes) return { ok: false, error: 'No encontramos ese pedido' }
+
   const pedido = await actualizarPedido(id, { estado })
   if (!pedido) return { ok: false, error: 'No encontramos ese pedido' }
 
+  // El inventario se mueve al entregar, no al pedir: mientras el pedido está
+  // vivo sus unidades cuentan como apartadas y ya no se pueden vender dos
+  // veces. Al entregar salen de verdad; si se deshace la entrega, vuelven.
+  if (antes.estado !== 'entregado' && estado === 'entregado') {
+    await descontarPorEntrega(pedido.items)
+  } else if (antes.estado === 'entregado' && estado !== 'entregado') {
+    await devolverAlInventario(pedido.items)
+  }
+
   refrescar(id)
+  revalidatePath('/catalogo')
+
   return { ok: true, mensaje: `${pedido.codigo} quedó como ${estado.replace('_', ' ')}` }
 }
 
@@ -117,6 +137,17 @@ export async function cambiarCantidad(
           i.varianteId === varianteId ? { ...i, cantidad: Math.min(cantidad, 999) } : i,
         )
 
+  // Subir una cantidad a mano tiene el mismo tope que la tienda. Se excluye
+  // este pedido del cálculo: sus propias líneas ya están apartadas y si no,
+  // se restarían dos veces.
+  if (cantidad > 0 && pedido.estado !== 'entregado' && pedido.estado !== 'cancelado') {
+    const faltas = await revisarDisponibilidad(items, {
+      exceptoPedido: id,
+      permitirOcultas: true,
+    })
+    if (faltas.length > 0) return { ok: false, error: mensajeDeFaltas(faltas) }
+  }
+
   await actualizarPedido(id, { items })
   refrescar(id)
 
@@ -159,6 +190,14 @@ export async function agregarItem(
     cantidad: 1,
   }
 
+  if (pedido.estado !== 'entregado' && pedido.estado !== 'cancelado') {
+    const faltas = await revisarDisponibilidad([nuevo], {
+      exceptoPedido: id,
+      permitirOcultas: true,
+    })
+    if (faltas.length > 0) return { ok: false, error: mensajeDeFaltas(faltas) }
+  }
+
   await actualizarPedido(id, { items: [...pedido.items, nuevo] })
   refrescar(id)
 
@@ -188,6 +227,7 @@ export async function opcionesParaAgregar() {
       etiqueta: `${producto.nombre} · ${variante.tamano === 'grande' ? 'Grande' : 'Pequeño'}`,
       precio: variante.precio,
       disponible: variante.disponible,
+      disponibles: variante.disponibles,
     })),
   )
 }
