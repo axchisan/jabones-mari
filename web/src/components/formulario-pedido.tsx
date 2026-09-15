@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ShoppingBag, Loader2, Check } from 'lucide-react'
+import { ShoppingBag, Loader2, Check, UserCheck } from 'lucide-react'
 import { usarCarrito, subtotalDe } from '@/lib/carrito'
 import { precio } from '@/lib/formato'
 import { ETIQUETA_TAMANO } from '@/lib/tipos'
@@ -15,7 +15,15 @@ import { cn } from '@/lib/utilidades'
 
 type Enviado = { codigo: string; enlace: string }
 
-export function FormularioPedido() {
+type DatosIniciales = {
+  clienteNombre: string
+  correo: string
+  telefono: string
+  direccion: string
+  barrio: string
+}
+
+export function FormularioPedido({ inicial }: { inicial?: DatosIniciales }) {
   const items = usarCarrito((e) => e.items)
   const hidratado = usarCarrito((e) => e.hidratado)
   const vaciar = usarCarrito((e) => e.vaciar)
@@ -30,6 +38,7 @@ export function FormularioPedido() {
   } = useForm<DatosCliente>({
     resolver: zodResolver(datosClienteSchema),
     mode: 'onBlur',
+    defaultValues: inicial,
   })
 
   // La casilla de novedades solo aparece si hay a dónde escribir.
@@ -182,6 +191,14 @@ export function FormularioPedido() {
         </div>
         <p className="mt-1 text-xs text-tinta-tenue">{DOMICILIO.texto}</p>
       </section>
+
+      {inicial && (
+        <p className="mt-6 flex items-center gap-2 rounded-suave bg-salvia-suave px-4 py-3 text-sm text-salvia">
+          <UserCheck className="size-4 shrink-0" aria-hidden="true" />
+          Llenamos tus datos con los de tu cuenta. Cámbialos aquí si este pedido va a otra
+          dirección.
+        </p>
+      )}
 
       {/* Formulario */}
       <form onSubmit={handleSubmit(alEnviar)} noValidate className="mt-6 flex flex-col gap-4">

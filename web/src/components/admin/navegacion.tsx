@@ -2,13 +2,14 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Package, ClipboardList, Users } from 'lucide-react'
+import { LayoutDashboard, Package, ClipboardList, Users, TrendingUp } from 'lucide-react'
 import { cn } from '@/lib/utilidades'
 
 const SECCIONES = [
   { href: '/admin', texto: 'Resumen', icono: LayoutDashboard, exacta: true },
   { href: '/admin/productos', texto: 'Catálogo', icono: Package, exacta: false },
   { href: '/admin/pedidos', texto: 'Pedidos', icono: ClipboardList, exacta: false },
+  { href: '/admin/ventas', texto: 'Ventas', icono: TrendingUp, exacta: false },
   { href: '/admin/equipo', texto: 'Equipo', icono: Users, exacta: false },
 ]
 

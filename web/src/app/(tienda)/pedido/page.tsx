@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { FormularioPedido } from '@/components/formulario-pedido'
+import { obtenerUsuario } from '@/lib/auth/sesion'
 
 export const metadata: Metadata = {
   title: 'Confirma tu pedido',
@@ -8,10 +9,25 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 }
 
-export default function PaginaPedido() {
+export default async function PaginaPedido() {
+  // Si ya entró y guardó sus datos, no hay por qué volver a pedírselos.
+  const usuario = await obtenerUsuario()
+
   return (
     <div className="mx-auto max-w-3xl px-4 py-10">
-      <FormularioPedido />
+      <FormularioPedido
+        inicial={
+          usuario
+            ? {
+                clienteNombre: usuario.name ?? '',
+                correo: usuario.email ?? '',
+                telefono: usuario.telefono ?? '',
+                direccion: usuario.direccion ?? '',
+                barrio: usuario.barrio ?? '',
+              }
+            : undefined
+        }
+      />
     </div>
   )
 }

@@ -53,6 +53,7 @@ export const PRODUCTOS_SEMILLA: Producto[] = [
     destacado: true,
     activo: true,
     orden: 1,
+    creadoEn: null,
     variantes: [
       {
         id: 'menta-romero-grande',
@@ -116,6 +117,7 @@ export const PRODUCTOS_SEMILLA: Producto[] = [
     destacado: true,
     activo: true,
     orden: 2,
+    creadoEn: null,
     variantes: [
       {
         id: 'arroz-grande',
@@ -179,6 +181,7 @@ export const PRODUCTOS_SEMILLA: Producto[] = [
     destacado: true,
     activo: true,
     orden: 3,
+    creadoEn: null,
     variantes: [
       {
         id: 'avena-grande',
@@ -246,6 +249,7 @@ export const PRODUCTOS_SEMILLA: Producto[] = [
     destacado: false,
     activo: true,
     orden: 4,
+    creadoEn: null,
     variantes: [
       {
         id: 'arroz-avena-grande',
@@ -314,6 +318,7 @@ export const PRODUCTOS_SEMILLA: Producto[] = [
     destacado: true,
     activo: true,
     orden: 5,
+    creadoEn: null,
     variantes: [
       {
         id: 'curcuma-miel-grande',
@@ -382,6 +387,7 @@ export const PRODUCTOS_SEMILLA: Producto[] = [
     destacado: true,
     activo: true,
     orden: 6,
+    creadoEn: null,
     variantes: [
       {
         id: 'naranja-coco-grande',

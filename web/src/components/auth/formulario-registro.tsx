@@ -60,14 +60,18 @@ export function FormularioRegistro({
     if (error) {
       setErrorGeneral(
         error.code === 'USER_ALREADY_EXISTS'
-          ? 'Ya hay una cuenta con ese correo. Prueba ingresando.'
+          ? conGoogle
+            ? 'Ya hay una cuenta con ese correo. Entra con tu contraseña, o con el botón de Google si así fue como te registraste.'
+            : 'Ya hay una cuenta con ese correo. Entra con tu contraseña desde la página de ingreso.'
           : 'No pudimos crear la cuenta. Intenta de nuevo.',
       )
       return
     }
 
-    router.push(volver)
-    router.refresh()
+    // No entra directo: primero confirma el correo con el código.
+    router.push(
+      `/verificar?correo=${encodeURIComponent(datos.email)}&volver=${encodeURIComponent(volver)}`,
+    )
   }
 
   return (

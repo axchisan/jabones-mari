@@ -177,6 +177,35 @@ computador.
 
 ---
 
+## Novedades programadas
+
+Una vez al mes, el día 1 a las 10 de la mañana, el sistema manda un correo a quien aceptó
+recibir novedades. Lo dispara una tarea de Vercel declarada en `vercel.json`.
+
+**Qué manda:** si hay productos publicados en los últimos 35 días, los anuncia. Si no, manda un
+recordatorio con los destacados. La idea es no inventar una novedad que no existe.
+
+**A quién:** solo a quien marcó la casilla en el pedido y no se ha dado de baja. Cada correo
+lleva su enlace de baja y las cabeceras `List-Unsubscribe`, que hacen que Gmail muestre su propio
+botón de baja — eso reduce mucho que la gente marque el correo como spam.
+
+**Protección:** la ruta exige la cabecera `Authorization: Bearer $CRON_SECRET`. Sin eso,
+cualquiera con la dirección podría dispararle correo a toda la lista.
+
+Para probarla a mano:
+
+```bash
+curl -s -H "Authorization: Bearer $CRON_SECRET" https://jabonesmari.shop/api/cron/novedades
+```
+
+Para cambiar la frecuencia, edita `vercel.json`. El horario va en UTC: `0 15 1 * *` es el día 1 a
+las 10 a. m. de Bogotá.
+
+> El plan gratuito de Vercel permite tareas programadas con frecuencia diaria o menor, que es de
+> sobra para esto.
+
+---
+
 ## Lo que podría venir después
 
 **Aviso por WhatsApp.** Sería lo ideal —llega donde la dueña ya vive— pero requiere la

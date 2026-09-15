@@ -137,3 +137,4 @@ Estas cinco cosas necesito que las confirmen ustedes, no las puedo inventar:
 | `11-prompts-listos.md` | Los 21 prompts ya ensamblados, para copiar y pegar. |
 | `12-whatsapp-business.md` | Qué hacer con el número del negocio. |
 | `13-avisos.md` | Avisos de pedidos por notificación y por correo. |
+| `14-presencia-digital.md` | Google Business, reseñas y dónde más estar. |

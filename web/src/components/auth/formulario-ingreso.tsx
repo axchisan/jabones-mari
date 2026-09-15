@@ -46,7 +46,9 @@ export function FormularioIngreso({
     if (error) {
       setErrorGeneral(
         error.status === 401 || error.status === 403
-          ? 'Ese correo o esa contraseña no coinciden.'
+          ? conGoogle
+            ? 'Ese correo o esa contraseña no coinciden. Si creaste la cuenta con Google, entra con el botón de arriba.'
+            : 'Ese correo o esa contraseña no coinciden.'
           : 'No pudimos ingresar. Intenta de nuevo en un momento.',
       )
       return
