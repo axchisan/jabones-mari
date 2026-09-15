@@ -64,6 +64,9 @@ export const pedidos = pgTable('pedidos', {
   barrio: text('barrio'),
   notas: text('notas'),
   observacionesInternas: text('observaciones_internas'),
+  // 'web' si entró por la tienda, 'manual' si lo registró la administración.
+  // Sirve para saber cuánto se vende por cada canal.
+  origen: text('origen').notNull().default('web'),
   // Instantánea de los precios al momento del pedido: el historial no debe mutar
   // si mañana cambian las tarifas.
   items: jsonb('items').$type<ItemPedido[]>().notNull().default([]),

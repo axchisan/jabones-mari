@@ -75,6 +75,7 @@ function aProducto(fila: FilaProducto, variantes: FilaVariante[]): Producto {
     destacado: fila.destacado,
     activo: fila.activo,
     orden: fila.orden,
+    creadoEn: fila.creadoEn,
     variantes: variantes
       .filter((v) => v.productoId === fila.id)
       .sort((a, b) => a.orden - b.orden)

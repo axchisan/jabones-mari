@@ -3,6 +3,8 @@ import { betterAuth } from 'better-auth'
 import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { nextCookies } from 'better-auth/next-js'
 import { admin as pluginAdmin } from 'better-auth/plugins'
+import { emailOTP } from 'better-auth/plugins/email-otp'
+import { enviarCodigo, type TipoCodigo } from '@/lib/notificaciones/correo-codigo'
 import { db, esquema } from '@/lib/db/cliente'
 import { SITIO_URL } from '@/lib/config'
 
@@ -45,10 +47,10 @@ export const auth = betterAuth({
     enabled: true,
     minPasswordLength: 8,
     maxPasswordLength: 128,
-    // El correo de verificación llega en una fase posterior; por ahora se
-    // permite entrar de inmediato para no bloquear a nadie al registrarse.
-    requireEmailVerification: false,
-    autoSignIn: true,
+    // Se exige confirmar el correo con un código antes de entrar: evita
+    // cuentas con correos ajenos o mal escritos, que luego no reciben nada.
+    requireEmailVerification: true,
+    autoSignIn: false,
   },
 
   socialProviders: hayGoogle
@@ -90,7 +92,23 @@ export const auth = betterAuth({
     },
   },
 
+  emailVerification: {
+    sendOnSignUp: true,
+    autoSignInAfterVerification: true,
+  },
+
   plugins: [
+    emailOTP({
+      otpLength: 6,
+      expiresIn: 600, // 10 minutos
+      allowedAttempts: 5,
+      // Con esto, verificar el código durante el registro da por confirmado
+      // el correo sin pedir un segundo paso.
+      sendVerificationOnSignUp: true,
+      async sendVerificationOTP({ email, otp, type }) {
+        await enviarCodigo(email, otp, type as TipoCodigo)
+      },
+    }),
     pluginAdmin({
       defaultRole: 'cliente',
       adminRoles: ['admin'],

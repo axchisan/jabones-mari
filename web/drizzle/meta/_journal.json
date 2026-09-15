@@ -29,6 +29,13 @@
       "when": 1789431894040,
       "tag": "0003_smiling_snowbird",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1789497078498,
+      "tag": "0004_even_storm",
+      "breakpoints": true
     }
   ]
 }

@@ -2,7 +2,7 @@ import 'server-only'
 import { randomUUID } from 'node:crypto'
 import { desc, eq, sql } from 'drizzle-orm'
 import { db, esquema } from '@/lib/db/cliente'
-import type { EstadoPedido, ItemPedido, Pedido } from '@/lib/tipos'
+import type { EstadoPedido, ItemPedido, OrigenPedido, Pedido } from '@/lib/tipos'
 
 /** Repositorio de pedidos. La base de datos es la única fuente de verdad. */
 
@@ -21,6 +21,10 @@ type NuevoPedido = {
   notas?: string | null
   items: ItemPedido[]
   usuarioId?: string | null
+  origen?: OrigenPedido
+  estado?: EstadoPedido
+  notasInternas?: string | null
+  domicilio?: number
 }
 
 export type CambiosPedido = Partial<
@@ -67,13 +71,15 @@ export async function crearPedido(entrada: NuevoPedido): Promise<Pedido> {
     direccion: entrada.direccion ?? null,
     barrio: entrada.barrio ?? null,
     notas: entrada.notas ?? null,
-    observacionesInternas: null,
+    observacionesInternas: entrada.notasInternas ?? null,
+    origen: entrada.origen ?? 'web',
     items: entrada.items,
     subtotal,
-    domicilio: 0,
-    total: subtotal,
-    // Nace abierto: la confirmación real ocurre en la conversación de WhatsApp.
-    estado: 'abierto' as EstadoPedido,
+    domicilio: entrada.domicilio ?? 0,
+    total: subtotal + (entrada.domicilio ?? 0),
+    // Por la tienda nace abierto: la confirmación ocurre en el chat. Registrado
+    // a mano nace confirmado, porque la venta ya pasó.
+    estado: entrada.estado ?? 'abierto',
     creadoEn: ahora,
     actualizadoEn: ahora,
   }

@@ -36,6 +36,7 @@ export type Producto = {
   destacado: boolean
   activo: boolean
   orden: number
+  creadoEn: Date | null
   variantes: Variante[]
 }
 
@@ -69,6 +70,14 @@ export const ETIQUETA_ESTADO: Record<EstadoPedido, string> = {
   cancelado: 'Cancelado',
 }
 
+export const ORIGENES_PEDIDO = ['web', 'manual'] as const
+export type OrigenPedido = (typeof ORIGENES_PEDIDO)[number]
+
+export const ETIQUETA_ORIGEN: Record<OrigenPedido, string> = {
+  web: 'Por la tienda',
+  manual: 'Registrado a mano',
+}
+
 export type ItemPedido = {
   varianteId: string
   productoSlug: string
@@ -86,6 +95,7 @@ export type Pedido = {
   telefono: string
   correo: string | null
   aceptaPromociones: boolean
+  origen: OrigenPedido
   direccion: string | null
   barrio: string | null
   notas: string | null
