@@ -22,6 +22,13 @@
       "when": 1789400132344,
       "tag": "0002_wakeful_betty_brant",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1789431894040,
+      "tag": "0003_smiling_snowbird",
+      "breakpoints": true
     }
   ]
 }

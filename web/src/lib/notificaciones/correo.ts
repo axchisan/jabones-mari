@@ -3,6 +3,8 @@ import { Resend } from 'resend'
 import { NEGOCIO, SITIO_URL } from '@/lib/config'
 import { precio, fechaLegible, telefonoLegible } from '@/lib/formato'
 import { ETIQUETA_TAMANO, type Pedido } from '@/lib/tipos'
+import { tokenDe } from '@/lib/notificaciones/suscriptores'
+import { enlaceWhatsApp } from '@/lib/config'
 
 /**
  * Aviso de pedido por correo.
@@ -218,4 +220,135 @@ export async function probarCorreo(): Promise<{ ok: boolean; detalle: string }> 
     ok: true,
     detalle: `Enviado a ${destinatarios.join(', ')}`,
   }
+}
+
+/* ------------------------------------------------ correo para la clienta */
+
+/**
+ * Confirmación del pedido para quien compró.
+ *
+ * Es transaccional: se manda porque hizo un pedido, no porque aceptara
+ * promociones. Por eso no lleva enlace de baja salvo que además esté
+ * suscrita, y en ese caso el enlace se refiere solo a las promociones.
+ */
+function plantillaCliente(pedido: Pedido, enlaceBaja: string | null): string {
+  const items = pedido.items
+    .map((item) =>
+      filaItem(
+        item.nombre,
+        `${ETIQUETA_TAMANO[item.tamano]} · ${item.cantidad} × ${precio(item.precio)}`,
+        precio(item.precio * item.cantidad),
+      ),
+    )
+    .join('')
+
+  const nombreCorto = pedido.clienteNombre.split(' ')[0]
+
+  return `<!doctype html>
+<html lang="es">
+<body style="margin:0;padding:24px 12px;background:${COLORES.crema};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;margin:0 auto">
+    <tr>
+      <td style="text-align:center;padding-bottom:20px">
+        <img src="${SITIO_URL}/logo-mari.png" width="64" height="64" alt="${NEGOCIO.nombre}" style="display:inline-block">
+      </td>
+    </tr>
+
+    <tr>
+      <td style="background:#ffffff;border:1px solid ${COLORES.linea};border-radius:16px;padding:28px 24px">
+        <h1 style="margin:0;color:${COLORES.tinta};font-size:24px;font-weight:600">
+          ¡Gracias, ${nombreCorto}!
+        </h1>
+        <p style="margin:10px 0 0;color:${COLORES.tintaMedia};font-size:16px;line-height:1.6">
+          Recibimos tu pedido <strong style="color:${COLORES.tinta}">${pedido.codigo}</strong>.
+          Te escribimos por WhatsApp para confirmarlo y coordinar la entrega.
+        </p>
+
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:24px">
+          ${items}
+          <tr>
+            <td style="padding:14px 0 0;color:${COLORES.tintaMedia};font-size:15px">Total</td>
+            <td align="right" style="padding:14px 0 0;color:${COLORES.tinta};font-size:22px;font-weight:700">
+              ${precio(pedido.total)}
+            </td>
+          </tr>
+        </table>
+
+        <p style="margin:20px 0 0;padding:14px 16px;background:${COLORES.crema};border-radius:12px;color:${COLORES.tintaMedia};font-size:14px;line-height:1.6">
+          El valor del domicilio lo acordamos contigo por WhatsApp. Todavía no has pagado nada:
+          este correo es solo la constancia de tu pedido.
+        </p>
+
+        <table role="presentation" cellpadding="0" cellspacing="0" style="margin-top:22px">
+          <tr>
+            <td>
+              <a href="${enlaceWhatsApp(`Hola, escribo por mi pedido ${pedido.codigo}`)}"
+                 style="display:inline-block;background:#128c4a;color:#ffffff;text-decoration:none;font-size:15px;font-weight:600;padding:13px 26px;border-radius:999px">
+                Escribirnos por WhatsApp
+              </a>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr>
+      <td style="padding-top:20px;text-align:center;color:${COLORES.tintaMedia};font-size:12px;line-height:1.7">
+        ${NEGOCIO.nombre} · ${NEGOCIO.tagline}<br>
+        Hecho a mano en ${NEGOCIO.ciudad} · <a href="${SITIO_URL}" style="color:${COLORES.rosaHondo}">jabonesmari.shop</a>
+        ${
+          enlaceBaja
+            ? `<br><br><span style="color:#94808a">Aceptaste recibir novedades nuestras.
+                 <a href="${enlaceBaja}" style="color:#94808a;text-decoration:underline">Darte de baja</a>
+                 (esto no afecta los correos de tus pedidos).</span>`
+            : ''
+        }
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`
+}
+
+export async function confirmarPedidoAlCliente(pedido: Pedido): Promise<boolean> {
+  if (!resend || !pedido.correo) return false
+
+  const token = pedido.aceptaPromociones ? await tokenDe(pedido.correo) : null
+  const enlaceBaja = token ? `${SITIO_URL}/baja?t=${token}` : null
+
+  const { error } = await resend.emails.send(
+    {
+      from: remitente,
+      to: [pedido.correo],
+      subject: `Recibimos tu pedido ${pedido.codigo} · Jabones Mari`,
+      html: plantillaCliente(pedido, enlaceBaja),
+      text: [
+        `¡Gracias, ${pedido.clienteNombre.split(' ')[0]}!`,
+        '',
+        `Recibimos tu pedido ${pedido.codigo}. Te escribimos por WhatsApp para confirmarlo.`,
+        '',
+        ...pedido.items.map(
+          (i) =>
+            `- ${i.cantidad} x ${i.nombre} (${ETIQUETA_TAMANO[i.tamano]}) ${precio(i.precio * i.cantidad)}`,
+        ),
+        '',
+        `Total: ${precio(pedido.total)}`,
+        '',
+        'Todavía no has pagado nada: este correo es solo la constancia de tu pedido.',
+        '',
+        `${NEGOCIO.nombre} · ${SITIO_URL}`,
+        enlaceBaja ? `\nDarte de baja de las novedades: ${enlaceBaja}` : '',
+      ]
+        .filter(Boolean)
+        .join('\n'),
+    },
+    { idempotencyKey: `confirmacion-cliente/${pedido.id}` },
+  )
+
+  if (error) {
+    console.error('[correo] no se pudo confirmar al cliente:', error.message)
+    return false
+  }
+
+  return true
 }

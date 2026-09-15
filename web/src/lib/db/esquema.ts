@@ -56,6 +56,10 @@ export const pedidos = pgTable('pedidos', {
   usuarioId: text('usuario_id').references(() => usuarios.id, { onDelete: 'set null' }),
   clienteNombre: text('cliente_nombre').notNull(),
   telefono: text('telefono').notNull(),
+  // Opcional: sin correo no hay confirmación, pero tampoco se bloquea la compra.
+  correo: text('correo'),
+  // Consentimiento explícito para promociones, dado en este pedido.
+  aceptaPromociones: boolean('acepta_promociones').notNull().default(false),
   direccion: text('direccion'),
   barrio: text('barrio'),
   notas: text('notas'),
@@ -76,6 +80,27 @@ export const pedidos = pgTable('pedidos', {
 export const ajustes = pgTable('ajustes', {
   clave: text('clave').primaryKey(),
   valor: jsonb('valor').notNull(),
+})
+
+/**
+ * Lista de correos con consentimiento para promociones.
+ *
+ * Se guarda aparte de los pedidos porque el consentimiento es de la persona,
+ * no de la compra: se da una vez y se puede revocar sin tocar el historial.
+ * La ley 1581 exige poder demostrar cuándo y cómo se dio, y poder retirarlo.
+ */
+export const suscriptoresCorreo = pgTable('suscriptores_correo', {
+  id: text('id').primaryKey(),
+  correo: text('correo').notNull().unique(),
+  nombre: text('nombre'),
+  acepta: boolean('acepta').notNull().default(true),
+  // 'pedido' o 'cuenta': de dónde salió el consentimiento.
+  origen: text('origen').notNull().default('pedido'),
+  // Va en el enlace de baja del pie de cada correo.
+  tokenBaja: text('token_baja').notNull().unique(),
+  aceptadoEn: timestamp('aceptado_en', { withTimezone: true }).notNull().defaultNow(),
+  revocadoEn: timestamp('revocado_en', { withTimezone: true }),
+  actualizadoEn: timestamp('actualizado_en', { withTimezone: true }).notNull().defaultNow(),
 })
 
 export * from './esquema-auth'

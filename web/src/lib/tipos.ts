@@ -84,6 +84,8 @@ export type Pedido = {
   usuarioId: string | null
   clienteNombre: string
   telefono: string
+  correo: string | null
+  aceptaPromociones: boolean
   direccion: string | null
   barrio: string | null
   notas: string | null

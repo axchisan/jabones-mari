@@ -25,6 +25,16 @@ export const datosClienteSchema = z.object({
     .min(2, 'Escribe tu nombre')
     .max(80, 'El nombre es muy largo'),
   telefono: telefonoCO,
+  correo: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .email('Revisa el correo')
+    .max(160)
+    .optional()
+    .or(z.literal('')),
+  // Debe llegar sin marcar por defecto: el consentimiento se da, no se asume.
+  aceptaPromociones: z.boolean().optional(),
   direccion: z
     .string()
     .trim()
