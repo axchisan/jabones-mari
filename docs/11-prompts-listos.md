@@ -641,54 +641,61 @@ Ten en cuenta que Facebook recorta los bordes: mantén el texto dentro del 80% c
 
 ## 7. Foto de producto — Carbón Activado y Té
 
-Este jabón todavía no tiene foto. Este prompt genera la foto de catálogo desde cero, siguiendo
-el mismo estilo que las otras seis: fondo crema, luz de ventana, mármol y el ingrediente real
-al lado.
+📎 **Sube:** `material/fotos-del-producto/carbon-te-original.jpg`
 
-📎 **No subas ninguna imagen** (no hay foto previa de este jabón).
+> La foto real está guardada con las demás originales. Igual que con los otros seis jabones,
+> se parte de ella para que la foto del catálogo sea del producto que de verdad se entrega.
 
 ```
 Eres fotógrafo de producto especializado en cosmética natural artesanal.
 
-Genera una fotografía de producto profesional de un jabón artesanal de carbón activado y
-hojas de té verde.
+A partir de la imagen de referencia que te doy, genera una fotografía de producto
+profesional del MISMO jabón, conservando con exactitud su forma, su color real y su
+textura. No inventes un jabón distinto: es una nueva toma del mismo objeto.
 
-EL PRODUCTO: una pastilla de jabón de glicerina hecha a mano, de color gris carbón muy
-oscuro, casi negro, con acabado ligeramente translúcido en los bordes cuando le da la luz.
-Tiene pequeñas hojas de té verde seco visiblemente incrustadas dentro. Forma ovalada
-irregular, hecha a mano, con los bordes suavemente redondeados.
+EL PRODUCTO: una pastilla con forma de CORAZÓN, hecha a mano, de color gris pizarra
+oscuro con un matiz verdoso, superficie lisa y satinada, con motas negras finas de
+carbón repartidas por toda la pastilla. NO tiene hojas ni hierbas visibles dentro:
+el acabado es liso y uniforme, solo con esas motas.
+
+Conserva la forma de corazón exactamente como en la referencia, con sus bordes
+redondeados y el pequeño reborde lateral.
 
 ESTILO OBLIGATORIO:
 - Fondo liso color crema cálido (#FCF8F4), sin telas arrugadas ni texturas que distraigan.
-- Luz natural suave de ventana lateral, temperatura neutra (5500K). Nada de luz morada ni
-  de bombillo.
+- Luz natural suave de ventana lateral, temperatura neutra (5500K). Nada de luz amarilla
+  ni de bombillo.
 - Sombra larga, suave y difusa hacia la derecha. Nunca sombra dura de flash.
 - Superficie de mármol blanco mate.
-- El jabón centrado y enfocado. Como es oscuro, cuida que no se empaste: que se distinga
-  la textura y las hojas de té dentro.
+- IMPORTANTE: como el jabón es muy oscuro, cuida que no se empaste ni se vea como una
+  mancha negra. Que la luz revele el volumen del corazón, el brillo satinado de la
+  superficie y las motas de carbón.
+- Quita la etiqueta adhesiva de la referencia: el jabón va limpio.
 
-COMPOSICIÓN: el jabón en el centro, ligeramente girado. A su derecha, unas hojas de té verde
-seco sueltas y una cucharita de madera con carbón activado en polvo. A la izquierda, una
-ramita de té verde fresco.
+COMPOSICIÓN: el jabón en el centro, ligeramente girado. A su derecha, unas hojas de té
+verde seco sueltas sobre el mármol. A la izquierda, una cucharita de madera con carbón
+activado en polvo.
 
 FORMATO: cuadrado 1:1, calidad editorial, muy alta resolución, aspecto limpio y premium.
 Realismo fotográfico absoluto. No ilustración, no render 3D.
 Sin texto, sin logos, sin marcas de agua, sin manos, sin personas.
 ```
 
-**Guárdala como:** `web/public/productos/carbon-te-1.jpg`
+**Guárdala como:** `carbon-te-1.jpg`
 
-> Pásala por [squoosh.app](https://squoosh.app) antes de subirla, o súbela directamente desde
-> el panel: ahí se guarda en R2 sin que tengas que tocar el proyecto.
+> Los ingredientes van **alrededor** del jabón, no dentro: en el producto real el carbón y
+> el té están integrados en la masa, no como trozos visibles. Ponerlos al lado cuenta la
+> receta sin falsear la pastilla.
 
 ### Foto de ambiente (opcional)
 
 ```
 Usando la misma imagen del jabón de carbón como referencia, genera ahora una fotografía de
-ambiente: el jabón reposa sobre una jabonera de cerámica blanca, junto al borde de un
-lavamanos de mármol claro. Al fondo, desenfocado, una toalla de lino color crema doblada y
-una taza de té verde humeante.
-Luz de ventana por la izquierda, matinal, con sombras suaves y largas.
+ambiente: el jabón con forma de corazón, gris pizarra oscuro, reposa sobre una jabonera de
+cerámica blanca junto al borde de un lavamanos de mármol claro. Al fondo, desenfocado, una
+toalla de lino color crema doblada y una taza de té verde.
+Luz de ventana por la izquierda, matinal, con sombras suaves y largas. Cuida que el jabón
+oscuro no se empaste: debe leerse su forma y su brillo.
 Formato 4:5 vertical, realista, alta resolución. Sin texto ni logos.
 ```
 
@@ -696,26 +703,65 @@ Formato 4:5 vertical, realista, alta resolución. Sin texto ni logos.
 
 ### Folleto del producto
 
-Una vez tengas la foto, usa el prompt de folleto con estos valores:
-
-📎 **Sube:** `carbon-te-1.jpg`
+📎 **Sube:** `carbon-te-1.jpg` (la que acabas de generar)
 
 ```
-[NOMBRE]        CARBÓN ACTIVADO Y TÉ
-[COLOR_RECETA]  gris carbón profundo #3D4A42
-[PIEL]          Grasa y mixta
-[USO]           Facial
+Eres diseñador gráfico de una marca de cosmética natural artesanal colombiana llamada
+"Mari" (jabones hechos a mano en Bogotá, lema "Limpieza con el alma").
 
-[BENEFICIO 1]   Limpieza profunda
-[BENEFICIO 2]   Absorbe el exceso de grasa
-[BENEFICIO 3]   Purifica los poros
-[BENEFICIO 4]   Antioxidante natural
-[BENEFICIO 5]   Ayuda a calmar la rojez
-[BENEFICIO 6]   Refresca sin resecar
+Diseña un folleto publicitario cuadrado de 1080x1080 píxeles para Instagram.
+
+PALETA EXACTA: fondo crema cálido #FCF8F4, color de esta receta gris pizarra profundo
+#3D4A42, rosa de marca #E07FAE, tinta para texto #2E2328.
+
+TIPOGRAFÍA: títulos en serif elegante de alto contraste; datos y beneficios en sans
+serif limpia y muy legible; etiquetas en mayúsculas con amplio espaciado.
+
+ESTRUCTURA, de arriba hacia abajo:
+
+1. MITAD SUPERIOR: la fotografía del jabón que te di, grande y protagonista, recortada
+   dentro de un marco con borde de trazo de pincel irregular.
+
+2. BANDA de trazo de pincel color #3D4A42 con el nombre centrado en serif blanco
+   mayúsculas: "CARBÓN ACTIVADO Y TÉ"
+   IMPORTANTE: "CARBÓN" lleva tilde en la O y "TÉ" lleva tilde en la E. Escríbelas.
+
+3. FRANJA sobre fondo crema, una sola línea centrada en sans serif:
+   "Tipo de piel: Grasa y mixta     Uso: Facial"
+
+4. BLOQUE DE BENEFICIOS: encabezado "BENEFICIOS" centrado en blanco sobre una banda de
+   trazo de pincel #3D4A42. Debajo, seis beneficios en dos columnas de tres, cada uno
+   precedido de un check ✓ color #3D4A42:
+
+   ✓ Limpieza profunda            ✓ Antioxidante natural
+   ✓ Absorbe el exceso de grasa   ✓ Ayuda a calmar la rojez
+   ✓ Purifica los poros           ✓ Refresca sin resecar
+
+5. PIE centrado sobre fondo crema, dos líneas:
+   "Grande $7.500  ·  Pequeño $5.000"
+   "jabonesmari.shop  ·  WhatsApp 321 288 1565"
+
+ESTILO: femenino, cálido y artesanal, pero adulto y cuidado. Mucho aire alrededor de
+los elementos. Nada infantil, nada de purpurina, nada de degradados chillones.
+
+IDIOMA: español de Colombia. Respeta TODAS las tildes: "CARBÓN", "TÉ", "Pequeño".
+Revisa la ortografía antes de dibujar el texto.
+
+Deja limpia la esquina superior derecha para colocar el logotipo después. No inventes
+texto ni agregues marcas de agua.
 ```
 
-> Ojo con las tildes: **CARBÓN** y **TÉ** las llevan las dos.
+### Historia de Instagram
 
+📎 **Sube:** `carbon-te-1.jpg` — mismo prompt que el 2.1, cambiando:
+
+```
+Título: "Limpieza profunda"
+Las tres líneas:
+  "Absorbe el exceso de grasa"
+  "Purifica los poros"
+  "Refresca sin resecar"
+```
 
 ---
 
