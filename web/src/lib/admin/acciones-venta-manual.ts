@@ -5,6 +5,11 @@ import { z } from 'zod'
 import { requerirAdmin } from '@/lib/auth/sesion'
 import { crearPedido } from '@/lib/pedidos'
 import { obtenerVariante, obtenerProductoPorId } from '@/lib/catalogo'
+import {
+  descontarPorEntrega,
+  revisarDisponibilidad,
+  mensajeDeFaltas,
+} from '@/lib/inventario'
 import { ESTADOS_PEDIDO, type EstadoPedido, type ItemPedido } from '@/lib/tipos'
 import type { ResultadoAccion } from '@/lib/admin/acciones-productos'
 
@@ -101,6 +106,14 @@ export async function registrarVentaManual(
     return { ok: false, error: 'No encontramos las presentaciones seleccionadas' }
   }
 
+  // Una venta a mano descuenta del mismo inventario que la tienda. Se permiten
+  // presentaciones ocultas: si María José la vendió en una feria, la venta ya
+  // pasó y hay que registrarla igual.
+  const faltas = await revisarDisponibilidad(items, { permitirOcultas: true })
+  if (faltas.length > 0) {
+    return { ok: false, error: mensajeDeFaltas(faltas) }
+  }
+
   try {
     const pedido = await crearPedido({
       clienteNombre: valores.clienteNombre,
@@ -116,7 +129,13 @@ export async function registrarVentaManual(
       domicilio: valores.domicilio,
     })
 
+    // Si nace entregada, el jabón ya salió: el inventario baja de una vez.
+    if (pedido.estado === 'entregado') {
+      await descontarPorEntrega(pedido.items)
+    }
+
     revalidatePath('/admin')
+    revalidatePath('/catalogo')
     revalidatePath('/admin/pedidos')
     revalidatePath('/admin/ventas')
 
@@ -143,6 +162,7 @@ export async function presentacionesParaVender() {
       etiqueta: `${producto.nombre} · ${variante.tamano === 'grande' ? 'Grande' : 'Pequeño'}`,
       precio: variante.precio,
       activo: producto.activo,
+      disponibles: variante.disponibles,
     })),
   )
 }

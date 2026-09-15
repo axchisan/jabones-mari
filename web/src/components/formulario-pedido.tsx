@@ -5,8 +5,9 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ShoppingBag, Loader2, Check, UserCheck } from 'lucide-react'
+import { ShoppingBag, Loader2, Check, UserCheck, Info } from 'lucide-react'
 import { usarCarrito, subtotalDe } from '@/lib/carrito'
+import { useSincronizarStock } from '@/lib/sincronizar-carrito'
 import { precio } from '@/lib/formato'
 import { ETIQUETA_TAMANO } from '@/lib/tipos'
 import { datosClienteSchema, type DatosCliente } from '@/lib/validacion'
@@ -27,8 +28,14 @@ export function FormularioPedido({ inicial }: { inicial?: DatosIniciales }) {
   const items = usarCarrito((e) => e.items)
   const hidratado = usarCarrito((e) => e.hidratado)
   const vaciar = usarCarrito((e) => e.vaciar)
+  const ajustes = usarCarrito((e) => e.ajustes)
+  const sincronizarLimites = usarCarrito((e) => e.sincronizarLimites)
   const [enviado, setEnviado] = useState<Enviado | null>(null)
   const [errorGeneral, setErrorGeneral] = useState<string | null>(null)
+
+  // Antes de pedir los datos se comprueba que todavía haya existencias: es
+  // preferible avisarlo aquí que después de que la clienta llene el formulario.
+  useSincronizarStock(!enviado)
 
   const {
     register,
@@ -70,6 +77,16 @@ export function FormularioPedido({ inicial }: { inicial?: DatosIniciales }) {
       if (!respuesta.ok) {
         const cuerpo = await respuesta.json().catch(() => null)
         setErrorGeneral(cuerpo?.error ?? 'No pudimos registrar el pedido. Intenta de nuevo.')
+
+        // Si fue por existencias, se refrescan los topes para que el resumen
+        // de arriba muestre lo que sí se puede llevar.
+        if (respuesta.status === 409) {
+          const ids = items.map((i) => i.varianteId).join(',')
+          const nuevos = await fetch(`/api/disponibilidad?ids=${encodeURIComponent(ids)}`)
+            .then((r) => (r.ok ? r.json() : null))
+            .catch(() => null)
+          if (nuevos?.limites) sincronizarLimites(nuevos.limites)
+        }
         return
       }
 
@@ -191,6 +208,20 @@ export function FormularioPedido({ inicial }: { inicial?: DatosIniciales }) {
         </div>
         <p className="mt-1 text-xs text-tinta-tenue">{DOMICILIO.texto}</p>
       </section>
+
+      {ajustes.length > 0 && (
+        <div
+          role="status"
+          className="mt-6 flex gap-2.5 rounded-suave bg-rosa-suave px-4 py-3 text-sm text-rosa-hondo"
+        >
+          <Info className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+          <ul className="flex flex-col gap-1">
+            {ajustes.map((aviso) => (
+              <li key={aviso}>{aviso}</li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {inicial && (
         <p className="mt-6 flex items-center gap-2 rounded-suave bg-salvia-suave px-4 py-3 text-sm text-salvia">

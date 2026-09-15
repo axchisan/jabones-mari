@@ -4,8 +4,9 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
-import { Minus, Plus, Trash2, X, ShoppingBag } from 'lucide-react'
-import { usarCarrito, subtotalDe, unidadesDe } from '@/lib/carrito'
+import { Minus, Plus, Trash2, X, ShoppingBag, Info } from 'lucide-react'
+import { usarCarrito, subtotalDe, unidadesDe, limiteDe } from '@/lib/carrito'
+import { useSincronizarStock } from '@/lib/sincronizar-carrito'
 import { precio } from '@/lib/formato'
 import { ETIQUETA_TAMANO } from '@/lib/tipos'
 import { DOMICILIO } from '@/lib/config'
@@ -18,6 +19,10 @@ export function CajonCarrito() {
   const items = usarCarrito((e) => e.items)
   const cambiarCantidad = usarCarrito((e) => e.cambiarCantidad)
   const quitar = usarCarrito((e) => e.quitar)
+  const ajustes = usarCarrito((e) => e.ajustes)
+
+  // Al abrir el carrito se comprueba el inventario: puede llevar días guardado.
+  useSincronizarStock(abierto)
 
   const subtotal = subtotalDe(items)
   const unidades = unidadesDe(items)
@@ -82,6 +87,20 @@ export function CajonCarrito() {
           </div>
         ) : (
           <>
+            {ajustes.length > 0 && (
+              <div
+                role="status"
+                className="mx-5 mt-4 flex gap-2.5 rounded-suave bg-rosa-suave px-4 py-3 text-sm text-rosa-hondo"
+              >
+                <Info className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+                <ul className="flex flex-col gap-1">
+                  {ajustes.map((aviso) => (
+                    <li key={aviso}>{aviso}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
             <ul className="flex-1 divide-y divide-linea overflow-y-auto px-5">
               {items.map((item) => (
                 <li key={item.varianteId} className="flex gap-3.5 py-4">
@@ -134,8 +153,9 @@ export function CajonCarrito() {
                         </span>
                         <button
                           type="button"
+                          disabled={item.cantidad >= limiteDe(item)}
                           onClick={() => cambiarCantidad(item.varianteId, item.cantidad + 1)}
-                          className="grid size-8 place-items-center rounded-r-full text-tinta-media transition hover:text-rosa-hondo"
+                          className="grid size-8 place-items-center rounded-r-full text-tinta-media transition hover:text-rosa-hondo disabled:opacity-35 disabled:hover:text-tinta-media"
                           aria-label="Agregar una unidad"
                         >
                           <Plus className="size-3.5" aria-hidden="true" />
@@ -145,6 +165,12 @@ export function CajonCarrito() {
                         {precio(item.precio * item.cantidad)}
                       </span>
                     </div>
+
+                    {item.limite !== null && item.limite !== undefined && item.cantidad >= item.limite && (
+                      <p className="text-xs text-tinta-tenue">
+                        Es todo lo que nos queda de esta presentación.
+                      </p>
+                    )}
                   </div>
                 </li>
               ))}

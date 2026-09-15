@@ -9,6 +9,11 @@ export type Variante = {
   molde: string
   sku: string
   stock: number | null
+  /**
+   * Unidades que se pueden vender ahora: el stock menos lo apartado en
+   * pedidos vivos. `null` significa sin límite (presentación por encargo).
+   */
+  disponibles: number | null
   disponible: boolean
   orden: number
 }
@@ -48,6 +53,12 @@ export type ItemCarrito = {
   precio: number
   imagen: string
   cantidad: number
+  /**
+   * Unidades que quedaban cuando se agregó. `null` = sin control de stock.
+   * Es una copia local que se refresca contra el servidor; la comprobación
+   * que vale es la del servidor al crear el pedido.
+   */
+  limite: number | null
 }
 
 export const ESTADOS_PEDIDO = [

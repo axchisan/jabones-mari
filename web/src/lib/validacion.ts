@@ -9,13 +9,23 @@ const telefonoCO = z
     message: 'Escribe un celular colombiano de 10 dígitos, por ejemplo 3211234567',
   })
 
+/**
+ * Una línea del carrito tal como llega del navegador.
+ *
+ * Solo `varianteId` y `cantidad` se toman en serio: el resto lo vuelve a leer
+ * el servidor del catálogo antes de guardar nada. Lo que manda el navegador
+ * se puede editar desde las herramientas del inspector, y un precio o un
+ * nombre que viajan sin comprobarse son un precio y un nombre que alguien
+ * puede poner a su gusto.
+ */
 export const itemPedidoSchema = z.object({
   varianteId: z.string().min(1),
-  productoSlug: z.string().min(1),
-  nombre: z.string().min(1),
-  tamano: z.enum(['grande', 'pequeno']),
-  precio: z.number().int().positive(),
   cantidad: z.number().int().min(1).max(99),
+  // Se aceptan por compatibilidad con el carrito guardado, y se descartan.
+  productoSlug: z.string().optional(),
+  nombre: z.string().optional(),
+  tamano: z.enum(['grande', 'pequeno']).optional(),
+  precio: z.number().optional(),
 })
 
 export const datosClienteSchema = z.object({

@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server'
 import { crearPedido } from '@/lib/pedidos'
+import { armarItemsDesdeCatalogo } from '@/lib/catalogo'
+import { revisarDisponibilidad, mensajeDeFaltas } from '@/lib/inventario'
 import { nuevoPedidoSchema } from '@/lib/validacion'
 import { construirMensaje } from '@/lib/whatsapp'
 import { obtenerSesion } from '@/lib/auth/sesion'
@@ -30,6 +32,34 @@ export async function POST(peticion: Request) {
   const datos = resultado.data
 
   try {
+    // El carrito vive en el navegador, así que llega con precios y nombres que
+    // cualquiera puede haber editado. Se rehace desde el catálogo antes de
+    // guardar nada: lo único que se respeta del cliente es qué y cuántos.
+    const { items, descartadas } = await armarItemsDesdeCatalogo(datos.items)
+
+    if (items.length === 0) {
+      return NextResponse.json(
+        {
+          error:
+            descartadas.length > 0
+              ? 'Los jabones de tu carrito ya no están disponibles. Vuelve al catálogo y ármalo de nuevo.'
+              : 'El carrito está vacío.',
+        },
+        { status: 409 },
+      )
+    }
+
+    // Y se comprueba que haya existencias de verdad. Lo disponible descuenta
+    // lo ya apartado en pedidos vivos, no solo lo que dice el stock.
+    const faltas = await revisarDisponibilidad(items)
+
+    if (faltas.length > 0) {
+      return NextResponse.json(
+        { error: mensajeDeFaltas(faltas), faltas },
+        { status: 409 },
+      )
+    }
+
     // Si la clienta tiene sesión, el pedido queda en su historial.
     const sesion = await obtenerSesion()
 
@@ -42,7 +72,7 @@ export async function POST(peticion: Request) {
       direccion: datos.direccion || null,
       barrio: datos.barrio || null,
       notas: datos.notas || null,
-      items: datos.items,
+      items,
     })
 
     const mensaje = construirMensaje({
