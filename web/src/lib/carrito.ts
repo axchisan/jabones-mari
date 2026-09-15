@@ -8,12 +8,17 @@ type EstadoCarrito = {
   items: ItemCarrito[]
   abierto: boolean
   hidratado: boolean
-  /** Lo que se recortó en la última sincronización, para poder avisarlo. */
+  /**
+   * Lo que se recortó por falta de existencias. Se queda hasta que la clienta
+   * lo cierra: es la única explicación de por qué desapareció algo que había
+   * elegido, y si se borrara sola no le quedaría manera de enterarse.
+   */
   ajustes: string[]
   agregar: (producto: Producto, variante: Variante) => void
   quitar: (varianteId: string) => void
   cambiarCantidad: (varianteId: string, cantidad: number) => void
-  sincronizarLimites: (limites: Record<string, number | null>) => void
+  /** Devuelve los avisos nuevos, para que quien llame pueda reaccionar. */
+  sincronizarLimites: (limites: Record<string, number | null>) => string[]
   olvidarAjustes: () => void
   vaciar: () => void
   abrir: () => void
@@ -38,7 +43,7 @@ function topeDe(item: { limite?: number | null }): number {
 
 export const usarCarrito = create<EstadoCarrito>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       items: [],
       abierto: false,
       hidratado: false,
@@ -96,34 +101,45 @@ export const usarCarrito = create<EstadoCarrito>()(
        * no alcanza. Un carrito guardado hace días puede tener cantidades que
        * dejaron de existir; mejor avisarlo aquí que en el último paso.
        */
-      sincronizarLimites: (limites) =>
-        set((estado) => {
-          const ajustes: string[] = []
+      sincronizarLimites: (limites) => {
+        const estado = get()
+        const nuevos: string[] = []
 
-          const items = estado.items.flatMap((item) => {
-            if (!(item.varianteId in limites)) return [item]
+        const items = estado.items.flatMap((item) => {
+          if (!(item.varianteId in limites)) return [item]
 
-            const limite = limites[item.varianteId]
-            const actualizado = { ...item, limite }
-            const tope = topeDe(actualizado)
+          const limite = limites[item.varianteId]
+          const actualizado = { ...item, limite }
+          const tope = topeDe(actualizado)
 
-            if (tope === 0) {
-              ajustes.push(`${item.nombre} se agotó y lo sacamos del carrito`)
-              return []
-            }
+          if (tope === 0) {
+            nuevos.push(
+              `${item.nombre} (${item.tamano === 'grande' ? 'grande' : 'pequeño'}) se agotó, así que lo sacamos de tu carrito`,
+            )
+            return []
+          }
 
-            if (actualizado.cantidad > tope) {
-              ajustes.push(
-                `De ${item.nombre} solo ${tope === 1 ? 'queda 1' : `quedan ${tope}`}, ajustamos la cantidad`,
-              )
-              return [{ ...actualizado, cantidad: tope }]
-            }
+          if (actualizado.cantidad > tope) {
+            nuevos.push(
+              `De ${item.nombre} (${item.tamano === 'grande' ? 'grande' : 'pequeño'}) solo ${tope === 1 ? 'queda 1' : `quedan ${tope}`}, así que ajustamos la cantidad`,
+            )
+            return [{ ...actualizado, cantidad: tope }]
+          }
 
-            return [actualizado]
-          })
+          return [actualizado]
+        })
 
-          return { items, ajustes }
-        }),
+        // Se suman a los que ya había, sin repetir. Quitar un jabón agotado
+        // cambia la lista y dispara otra sincronización enseguida: si esta
+        // reemplazara los avisos, el mensaje se borraría antes de leerse.
+        const ajustes =
+          nuevos.length > 0
+            ? [...estado.ajustes, ...nuevos.filter((a) => !estado.ajustes.includes(a))]
+            : estado.ajustes
+
+        set({ items, ajustes })
+        return nuevos
+      },
 
       olvidarAjustes: () => set({ ajustes: [] }),
       vaciar: () => set({ items: [], ajustes: [] }),

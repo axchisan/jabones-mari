@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 import { usarCarrito } from '@/lib/carrito'
 
 /**
@@ -13,6 +14,7 @@ import { usarCarrito } from '@/lib/carrito'
  * `activo` evita pedirlo cuando el carrito está cerrado.
  */
 export function useSincronizarStock(activo = true) {
+  const router = useRouter()
   const items = usarCarrito((e) => e.items)
   const hidratado = usarCarrito((e) => e.hidratado)
   const sincronizarLimites = usarCarrito((e) => e.sincronizarLimites)
@@ -32,7 +34,23 @@ export function useSincronizarStock(activo = true) {
     })
       .then((respuesta) => (respuesta.ok ? respuesta.json() : null))
       .then((cuerpo) => {
-        if (cuerpo?.limites) sincronizarLimites(cuerpo.limites)
+        if (!cuerpo?.limites) return
+
+        const avisos = sincronizarLimites(cuerpo.limites)
+
+        // Si algo se agotó, la página que hay detrás está mintiendo: se quedó
+        // con el catálogo que se cargó al entrar y sigue mostrando existencias
+        // que ya no hay. router.refresh() vacía la caché del enrutador y trae
+        // el catálogo de nuevo, así el precio y el "Quedan N" cuadran con el
+        // aviso del carrito.
+        if (avisos.length > 0) {
+          router.refresh()
+
+          // Se olvida la última consulta: si la clienta vuelve a tocar el
+          // botón en la página vieja, hay que volver a preguntar en vez de
+          // dar por bueno lo que ya se consultó para esa misma lista.
+          ultimaConsulta.current = ''
+        }
       })
       .catch(() => {
         // Sin red no se recorta nada: el servidor lo comprobará igual al
@@ -41,5 +59,5 @@ export function useSincronizarStock(activo = true) {
       })
 
     return () => cancelar.abort()
-  }, [activo, hidratado, ids, sincronizarLimites])
+  }, [activo, hidratado, ids, sincronizarLimites, router])
 }

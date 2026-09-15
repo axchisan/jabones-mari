@@ -5,9 +5,10 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ShoppingBag, Loader2, Check, UserCheck, Info } from 'lucide-react'
+import { ShoppingBag, Loader2, Check, UserCheck } from 'lucide-react'
 import { usarCarrito, subtotalDe } from '@/lib/carrito'
 import { useSincronizarStock } from '@/lib/sincronizar-carrito'
+import { AvisoExistencias } from '@/components/aviso-existencias'
 import { precio } from '@/lib/formato'
 import { ETIQUETA_TAMANO } from '@/lib/tipos'
 import { datosClienteSchema, type DatosCliente } from '@/lib/validacion'
@@ -29,6 +30,7 @@ export function FormularioPedido({ inicial }: { inicial?: DatosIniciales }) {
   const hidratado = usarCarrito((e) => e.hidratado)
   const vaciar = usarCarrito((e) => e.vaciar)
   const ajustes = usarCarrito((e) => e.ajustes)
+  const olvidarAjustes = usarCarrito((e) => e.olvidarAjustes)
   const sincronizarLimites = usarCarrito((e) => e.sincronizarLimites)
   const [enviado, setEnviado] = useState<Enviado | null>(null)
   const [errorGeneral, setErrorGeneral] = useState<string | null>(null)
@@ -141,21 +143,25 @@ export function FormularioPedido({ inicial }: { inicial?: DatosIniciales }) {
   /* -------------------------------------------------------- carrito vacío */
   if (hidratado && items.length === 0) {
     return (
-      <div className="rounded-tarjeta border border-dashed border-linea-fuerte bg-white p-10 text-center">
-        <span className="mx-auto grid size-14 place-items-center rounded-full bg-rosa-suave text-rosa-hondo">
-          <ShoppingBag className="size-6" aria-hidden="true" />
-        </span>
-        <h1 className="mt-4 text-2xl">Tu carrito está vacío</h1>
-        <p className="mt-2 text-tinta-media">
-          Agrega algún jabón y vuelve para confirmar el pedido.
-        </p>
-        <Link
-          href="/catalogo"
-          className="mt-5 inline-block rounded-full bg-rosa px-6 py-3 font-semibold text-white transition hover:bg-rosa-hondo"
-        >
-          Ver el catálogo
-        </Link>
-      </div>
+      <>
+        <AvisoExistencias avisos={ajustes} alCerrar={olvidarAjustes} className="mb-5" />
+
+        <div className="rounded-tarjeta border border-dashed border-linea-fuerte bg-white p-10 text-center">
+          <span className="mx-auto grid size-14 place-items-center rounded-full bg-rosa-suave text-rosa-hondo">
+            <ShoppingBag className="size-6" aria-hidden="true" />
+          </span>
+          <h1 className="mt-4 text-2xl">Tu carrito está vacío</h1>
+          <p className="mt-2 text-tinta-media">
+            Agrega algún jabón y vuelve para confirmar el pedido.
+          </p>
+          <Link
+            href="/catalogo"
+            className="mt-5 inline-block rounded-full bg-rosa px-6 py-3 font-semibold text-white transition hover:bg-rosa-hondo"
+          >
+            Ver el catálogo
+          </Link>
+        </div>
+      </>
     )
   }
 
@@ -209,19 +215,7 @@ export function FormularioPedido({ inicial }: { inicial?: DatosIniciales }) {
         <p className="mt-1 text-xs text-tinta-tenue">{DOMICILIO.texto}</p>
       </section>
 
-      {ajustes.length > 0 && (
-        <div
-          role="status"
-          className="mt-6 flex gap-2.5 rounded-suave bg-rosa-suave px-4 py-3 text-sm text-rosa-hondo"
-        >
-          <Info className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
-          <ul className="flex flex-col gap-1">
-            {ajustes.map((aviso) => (
-              <li key={aviso}>{aviso}</li>
-            ))}
-          </ul>
-        </div>
-      )}
+      <AvisoExistencias avisos={ajustes} alCerrar={olvidarAjustes} className="mt-6" />
 
       {inicial && (
         <p className="mt-6 flex items-center gap-2 rounded-suave bg-salvia-suave px-4 py-3 text-sm text-salvia">
