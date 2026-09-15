@@ -51,8 +51,13 @@ export default function Privacidad() {
           <p>Solo estos, y solo cuando tú los escribes:</p>
           <ul className="mt-2 flex flex-col gap-1.5 pl-5">
             <li className="list-disc marker:text-rosa">
-              <strong>Al hacer un pedido:</strong> tu nombre, tu número de celular y, si
-              nos la das, tu dirección, tu barrio y las notas que nos escribas.
+              <strong>Al hacer un pedido:</strong> tu nombre, tu número de celular y, si nos
+              los das, tu correo, tu dirección, tu barrio y las notas que nos escribas.
+            </li>
+            <li className="list-disc marker:text-rosa">
+              <strong>Si marcas la casilla de novedades:</strong> guardamos tu correo en una
+              lista aparte, junto con la fecha en que lo aceptaste. Esa casilla nunca viene
+              marcada: hay que marcarla a propósito.
             </li>
             <li className="list-disc marker:text-rosa">
               <strong>Si creas una cuenta:</strong> tu correo y tu nombre. Si entras con
@@ -87,6 +92,14 @@ export default function Privacidad() {
               entrega cada vez.
             </li>
             <li className="list-disc marker:text-rosa">
+              Enviarte la confirmación de tu pedido, si nos diste tu correo.
+            </li>
+            <li className="list-disc marker:text-rosa">
+              Contarte novedades <strong>solo si marcaste la casilla</strong>. Puedes darte
+              de baja desde el enlace que va al pie de cada correo, y eso no afecta los
+              correos de tus pedidos.
+            </li>
+            <li className="list-disc marker:text-rosa">
               Entender qué productos interesan más, con estadísticas anónimas.
             </li>
           </ul>
@@ -107,6 +120,9 @@ export default function Privacidad() {
             </li>
             <li className="list-disc marker:text-rosa">
               <strong>Cloudflare</strong> — guarda las fotos del catálogo.
+            </li>
+            <li className="list-disc marker:text-rosa">
+              <strong>Resend</strong> — envía los correos de confirmación y de novedades.
             </li>
             <li className="list-disc marker:text-rosa">
               <strong>Google</strong> — solo si eliges entrar con tu cuenta de Google.

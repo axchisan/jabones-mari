@@ -3,7 +3,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ShoppingBag, Loader2, Check } from 'lucide-react'
 import { usarCarrito, subtotalDe } from '@/lib/carrito'
@@ -25,11 +25,17 @@ export function FormularioPedido() {
   const {
     register,
     handleSubmit,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<DatosCliente>({
     resolver: zodResolver(datosClienteSchema),
     mode: 'onBlur',
   })
+
+  // La casilla de novedades solo aparece si hay a dónde escribir.
+  // useWatch en vez de watch: el otro devuelve funciones que el compilador
+  // de React no puede memoizar, y desactiva la optimización del formulario.
+  const correo = useWatch({ control, name: 'correo' })
 
   const subtotal = subtotalDe(items)
 
@@ -214,6 +220,22 @@ export function FormularioPedido() {
         </Campo>
 
         <Campo
+          id="correo"
+          etiqueta="Correo"
+          ayuda="Opcional. Te mandamos la confirmación de tu pedido."
+          error={errors.correo?.message}
+        >
+          <input
+            id="correo"
+            type="email"
+            autoComplete="email"
+            placeholder="tucorreo@ejemplo.com"
+            {...register('correo')}
+            className={entrada(errors.correo)}
+          />
+        </Campo>
+
+        <Campo
           id="direccion"
           etiqueta="Dirección de entrega"
           ayuda="Opcional. Si prefieres, la acordamos por el chat."
@@ -254,6 +276,23 @@ export function FormularioPedido() {
           />
         </Campo>
 
+        {correo && (
+          <label className="flex items-start gap-3 rounded-suave border border-linea bg-white px-4 py-3">
+            <input
+              type="checkbox"
+              {...register('aceptaPromociones')}
+              className="mt-0.5 size-4 shrink-0 accent-[#e07fae]"
+            />
+            <span className="text-sm">
+              <span className="block font-semibold">Quiero recibir novedades</span>
+              <span className="block text-tinta-media">
+                Recetas nuevas y detalles de temporada, muy de vez en cuando. Te puedes dar
+                de baja en cualquier momento.
+              </span>
+            </span>
+          </label>
+        )}
+
         {errorGeneral && (
           <p role="alert" className="rounded-suave bg-rosa-suave px-4 py-3 text-sm text-rosa-hondo">
             {errorGeneral}
@@ -277,6 +316,16 @@ export function FormularioPedido() {
 
         <p className="text-center text-xs text-tinta-tenue">
           No pedimos datos de pago. El pedido se confirma contigo por WhatsApp.
+          <br />
+          Al continuar aceptas nuestros{' '}
+          <Link href="/terminos" className="underline hover:text-rosa-hondo">
+            términos
+          </Link>{' '}
+          y la{' '}
+          <Link href="/privacidad" className="underline hover:text-rosa-hondo">
+            política de privacidad
+          </Link>
+          .
         </p>
       </form>
     </>

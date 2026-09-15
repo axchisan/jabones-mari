@@ -14,6 +14,8 @@ function baseDeDatos() {
 type NuevoPedido = {
   clienteNombre: string
   telefono: string
+  correo?: string | null
+  aceptaPromociones?: boolean
   direccion?: string | null
   barrio?: string | null
   notas?: string | null
@@ -26,6 +28,7 @@ export type CambiosPedido = Partial<
     Pedido,
     | 'clienteNombre'
     | 'telefono'
+    | 'correo'
     | 'direccion'
     | 'barrio'
     | 'notas'
@@ -59,6 +62,8 @@ export async function crearPedido(entrada: NuevoPedido): Promise<Pedido> {
     usuarioId: entrada.usuarioId ?? null,
     clienteNombre: entrada.clienteNombre,
     telefono: entrada.telefono,
+    correo: entrada.correo ?? null,
+    aceptaPromociones: entrada.aceptaPromociones ?? false,
     direccion: entrada.direccion ?? null,
     barrio: entrada.barrio ?? null,
     notas: entrada.notas ?? null,
@@ -139,6 +144,7 @@ export async function actualizarPedido(
     .set({
       clienteNombre: actualizado.clienteNombre,
       telefono: actualizado.telefono,
+      correo: actualizado.correo,
       direccion: actualizado.direccion,
       barrio: actualizado.barrio,
       notas: actualizado.notas,

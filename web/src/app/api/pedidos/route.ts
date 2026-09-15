@@ -4,7 +4,8 @@ import { nuevoPedidoSchema } from '@/lib/validacion'
 import { construirMensaje } from '@/lib/whatsapp'
 import { obtenerSesion } from '@/lib/auth/sesion'
 import { avisarAdministracion } from '@/lib/notificaciones/push'
-import { avisarPedidoPorCorreo } from '@/lib/notificaciones/correo'
+import { avisarPedidoPorCorreo, confirmarPedidoAlCliente } from '@/lib/notificaciones/correo'
+import { registrarConsentimiento } from '@/lib/notificaciones/suscriptores'
 import { precio } from '@/lib/formato'
 
 export async function POST(peticion: Request) {
@@ -36,6 +37,8 @@ export async function POST(peticion: Request) {
       usuarioId: sesion?.user?.id ?? null,
       clienteNombre: datos.clienteNombre,
       telefono: datos.telefono,
+      correo: datos.correo || null,
+      aceptaPromociones: Boolean(datos.aceptaPromociones && datos.correo),
       direccion: datos.direccion || null,
       barrio: datos.barrio || null,
       notas: datos.notas || null,
@@ -57,6 +60,16 @@ export async function POST(peticion: Request) {
     // ya está guardado y se ve igual en el panel.
     const unidades = pedido.items.reduce((suma, i) => suma + i.cantidad, 0)
 
+    // El consentimiento se registra antes de los correos: el de confirmación
+    // necesita el token de baja si la clienta aceptó promociones.
+    if (pedido.aceptaPromociones && pedido.correo) {
+      try {
+        await registrarConsentimiento(pedido.correo, pedido.clienteNombre, 'pedido')
+      } catch (error) {
+        console.error('[pedidos] no se pudo registrar el consentimiento', error)
+      }
+    }
+
     Promise.allSettled([
       avisarAdministracion({
         titulo: `Pedido nuevo · ${precio(pedido.total)}`,
@@ -65,6 +78,7 @@ export async function POST(peticion: Request) {
         etiqueta: `pedido-${pedido.codigo}`,
       }),
       avisarPedidoPorCorreo(pedido),
+      confirmarPedidoAlCliente(pedido),
     ]).then((resultados) => {
       for (const resultado of resultados) {
         if (resultado.status === 'rejected') {

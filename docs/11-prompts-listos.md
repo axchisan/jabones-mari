@@ -17,6 +17,7 @@ esquina que queda libre. El logo nunca se genera con IA.
 4. [Publicación de combos](#4-publicación-de-combos)
 5. [Carrusel «¿Cuál es tu jabón?»](#5-carrusel-cuál-es-tu-jabón) — 6 láminas
 6. [Portada de Facebook](#6-portada-de-facebook)
+7. [Foto de producto — Carbón Activado y Té](#7-foto-de-producto--carbón-activado-y-té)
 
 ---
 
@@ -635,6 +636,86 @@ ESTILO: elegante, cálido, con mucho aire. Español de Colombia con tildes corre
 
 Ten en cuenta que Facebook recorta los bordes: mantén el texto dentro del 80% central.
 ```
+
+---
+
+## 7. Foto de producto — Carbón Activado y Té
+
+Este jabón todavía no tiene foto. Este prompt genera la foto de catálogo desde cero, siguiendo
+el mismo estilo que las otras seis: fondo crema, luz de ventana, mármol y el ingrediente real
+al lado.
+
+📎 **No subas ninguna imagen** (no hay foto previa de este jabón).
+
+```
+Eres fotógrafo de producto especializado en cosmética natural artesanal.
+
+Genera una fotografía de producto profesional de un jabón artesanal de carbón activado y
+hojas de té verde.
+
+EL PRODUCTO: una pastilla de jabón de glicerina hecha a mano, de color gris carbón muy
+oscuro, casi negro, con acabado ligeramente translúcido en los bordes cuando le da la luz.
+Tiene pequeñas hojas de té verde seco visiblemente incrustadas dentro. Forma ovalada
+irregular, hecha a mano, con los bordes suavemente redondeados.
+
+ESTILO OBLIGATORIO:
+- Fondo liso color crema cálido (#FCF8F4), sin telas arrugadas ni texturas que distraigan.
+- Luz natural suave de ventana lateral, temperatura neutra (5500K). Nada de luz morada ni
+  de bombillo.
+- Sombra larga, suave y difusa hacia la derecha. Nunca sombra dura de flash.
+- Superficie de mármol blanco mate.
+- El jabón centrado y enfocado. Como es oscuro, cuida que no se empaste: que se distinga
+  la textura y las hojas de té dentro.
+
+COMPOSICIÓN: el jabón en el centro, ligeramente girado. A su derecha, unas hojas de té verde
+seco sueltas y una cucharita de madera con carbón activado en polvo. A la izquierda, una
+ramita de té verde fresco.
+
+FORMATO: cuadrado 1:1, calidad editorial, muy alta resolución, aspecto limpio y premium.
+Realismo fotográfico absoluto. No ilustración, no render 3D.
+Sin texto, sin logos, sin marcas de agua, sin manos, sin personas.
+```
+
+**Guárdala como:** `web/public/productos/carbon-te-1.jpg`
+
+> Pásala por [squoosh.app](https://squoosh.app) antes de subirla, o súbela directamente desde
+> el panel: ahí se guarda en R2 sin que tengas que tocar el proyecto.
+
+### Foto de ambiente (opcional)
+
+```
+Usando la misma imagen del jabón de carbón como referencia, genera ahora una fotografía de
+ambiente: el jabón reposa sobre una jabonera de cerámica blanca, junto al borde de un
+lavamanos de mármol claro. Al fondo, desenfocado, una toalla de lino color crema doblada y
+una taza de té verde humeante.
+Luz de ventana por la izquierda, matinal, con sombras suaves y largas.
+Formato 4:5 vertical, realista, alta resolución. Sin texto ni logos.
+```
+
+**Guárdala como:** `carbon-te-2.jpg`
+
+### Folleto del producto
+
+Una vez tengas la foto, usa el prompt de folleto con estos valores:
+
+📎 **Sube:** `carbon-te-1.jpg`
+
+```
+[NOMBRE]        CARBÓN ACTIVADO Y TÉ
+[COLOR_RECETA]  gris carbón profundo #3D4A42
+[PIEL]          Grasa y mixta
+[USO]           Facial
+
+[BENEFICIO 1]   Limpieza profunda
+[BENEFICIO 2]   Absorbe el exceso de grasa
+[BENEFICIO 3]   Purifica los poros
+[BENEFICIO 4]   Antioxidante natural
+[BENEFICIO 5]   Ayuda a calmar la rojez
+[BENEFICIO 6]   Refresca sin resecar
+```
+
+> Ojo con las tildes: **CARBÓN** y **TÉ** las llevan las dos.
+
 
 ---
 
