@@ -68,9 +68,13 @@ Al tocarla, abre directamente ese pedido en el panel.
 
 ---
 
-## 2. Correo — falta un paso
+## 2. Correo — ya funciona
 
-El código está listo; faltan las credenciales. Son unos 10 minutos.
+> ✅ **Configurado y probado.** El dominio `jabonesmari.shop` está verificado en Resend
+> (DKIM y los dos CNAME de SPF propagados), y un pedido de prueba entregó los dos correos:
+> el aviso al negocio y la confirmación a la clienta. La baja también quedó comprobada.
+
+Lo que sigue queda como referencia, por si hay que rehacerlo o cambiar el destinatario.
 
 ### Paso 1 · Crear la clave de Resend
 
@@ -119,6 +123,31 @@ git commit --allow-empty -m "Activa los avisos por correo" && git push
 ### Paso 5 · Probar
 
 En el panel, en *Resumen*, aparece el botón **Probar correo**. Si llega, está listo.
+
+### Cambiar a quién le llega
+
+`NOTIFICAR_A` es la única variable que hay que tocar para eso. Hoy apunta a
+`axchisan923@gmail.com`; cuando la tía tenga su correo listo, se agrega separado por coma:
+
+```bash
+NOTIFICAR_A=axchisan923@gmail.com,tia@ejemplo.com
+```
+
+Luego `node scripts/subir-variables.mjs` y un push.
+
+### El registro DMARC, que quedó pendiente
+
+Resend lo marca como opcional y el correo sale igual sin él, pero **mejora la entrega**: le
+dice a Gmail y Outlook qué hacer con los correos que dicen venir del dominio y no pasan las
+comprobaciones.
+
+En Hostinger, agrega un registro más:
+
+| Tipo | Nombre | Contenido |
+|---|---|---|
+| TXT | `_dmarc` | `v=DMARC1; p=none;` |
+
+`p=none` solo observa, no rechaza nada: es el ajuste correcto para empezar.
 
 ---
 
