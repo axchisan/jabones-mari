@@ -5,6 +5,11 @@ Catálogo administrable, carrito y pedidos que se cierran por WhatsApp.
 
 **Producción:** https://jabonesmari.shop
 
+<p align="center">
+  <img src="docs/capturas/escritorio.jpg" width="74%" alt="Página de inicio de Jabones Mari en escritorio">
+  <img src="docs/capturas/movil.jpg" width="22%" alt="Página de inicio de Jabones Mari en el celular">
+</p>
+
 ---
 
 ## Qué hay aquí
